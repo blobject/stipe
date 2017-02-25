@@ -2,8 +2,7 @@
   (:require [collar.views :as views]
             [compojure.core :as cc]
             [compojure.handler :as handler]
-            [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]))
+            [compojure.route :as route]))
 
 (cc/defroutes app-routes
   (cc/GET "/"
@@ -20,6 +19,3 @@
           (views/page-wip))
   (route/resources "/")
   (route/not-found "not found"))
-
-(def app
-  (wrap-defaults app-routes site-defaults))
