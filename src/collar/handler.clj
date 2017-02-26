@@ -1,5 +1,5 @@
 (ns collar.handler
-  (:require [collar.views :as views]
+  (:require [collar.view :as view]
             [compojure.core :as cc]
             [compojure.handler :as handler]
             [compojure.route :as route]))
@@ -7,15 +7,15 @@
 (cc/defroutes app-routes
   (cc/GET "/"
           []
-          (views/page-root))
+          (view/page-root))
   (cc/GET "/do"
           []
-          (views/page-do))
+          (view/page-do))
   (cc/GET "/who"
           []
-          (views/page-who))
+          (view/page-who))
   (cc/GET "/wip"
           []
-          (views/page-wip))
+          (view/page-wip))
   (route/resources "/")
   (route/not-found "not found"))
