@@ -1,5 +1,7 @@
 (ns collar.view.page
-  (:require [collar.view.verse :as verse]
+  (:require [collar.db :as db]
+            [collar.view.piece :as piece]
+            [collar.view.verse :as verse]
             [hiccup.page :as hiccup]))
 
 (defn root []
@@ -25,7 +27,7 @@
    verse/nav
    [:div.page
     [:h1 "tags"]
-    [:p "tags"]]))
+    (map #(piece/tag %) (db/get-coll "tags"))]))
 
 (defn who []
   (hiccup/html5

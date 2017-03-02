@@ -60,3 +60,22 @@ a:visited {
 .page a:focus, .page a:hover {
   color: #3e999f;
 }
+
+.tag {
+  display: inline-block;
+  margin: 5px;
+  border: 1px solid #aaaaaa;
+}
+
+.tag .name {
+  display: inline-block;
+  font-size: small;
+  padding: 0 2px;
+}
+
+.tag .count {
+  display: inline-block;
+  font-size: small;
+  padding: 0 2px;
+  border-left: 1px solid #aaaaaa;
+}
