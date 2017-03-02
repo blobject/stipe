@@ -1,7 +1,7 @@
-(ns collar.handler-test
+(ns collar.route-test
   (:require [clojure.test :refer :all]
             [ring.mock.request :as mock]
-            [collar.handler :refer :all]))
+            [collar.route :refer :all]))
 
 (deftest test-app
   (testing "main route"
