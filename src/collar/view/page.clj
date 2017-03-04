@@ -4,35 +4,46 @@
             [collar.view.verse :as verse]
             [hiccup.page :as hiccup]))
 
-(defn root []
+(defn template-basic
+  [title body]
   (hiccup/html5
-   (verse/head "root")
+   (verse/head title)
    verse/nav
+   body))
+
+(def root
+  (template-basic
+   "root"
    [:div.page
     [:h1 "the other head"]
     [:p ":-:-)"]]))
 
-(defn pages []
-  (hiccup/html5
-   (verse/head "pages")
-   verse/nav
+(def new
+  (template-basic
+   "new"
+   [:div.page
+    [:h1 "new"]
+    [:textarea "hello"]]))
+
+(def pages
+  (template-basic
+   "pages"
    [:div.page
     [:h1 "pages"]
     verse/search
-    [:div.extract]]))
+    [:div.extract
+     (map #(piece/clip %) (db/get-coll "entries"))]]))
 
-(defn tags []
-  (hiccup/html5
-   (verse/head "tags")
-   verse/nav
+(def tags
+  (template-basic
+   "tags"
    [:div.page
     [:h1 "tags"]
     (map #(piece/tag %) (db/get-coll "tags"))]))
 
-(defn who []
-  (hiccup/html5
-   (verse/head "who")
-   verse/nav
+(def who
+  (template-basic
+   "who"
    [:div.page
     [:h1 "who"]
     [:p "agaric"]]))
