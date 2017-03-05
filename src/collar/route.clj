@@ -5,7 +5,7 @@
 
 (compojure/defroutes routes
   (compojure/GET "/" [] view/root)
-  (compojure/GET "/new" [] view/new)
+  (compojure/GET "/draft" [] view/draft)
   (compojure/GET "/pages" [] view/pages)
   (compojure/GET "/tags" [] view/tags)
   (compojure/GET "/who" [] view/who)

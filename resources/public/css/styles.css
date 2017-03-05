@@ -15,6 +15,10 @@ h1, h2, h3, h4, h5, h6, div {
   font-size: medium;
 }
 
+h1 {
+  margin: 20px 0 40px;
+}
+
 a {
   text-decoration: none;
 }
@@ -72,9 +76,15 @@ a:visited {
   padding: 0 2px;
 }
 
-.tag .count {
+.clip .title {
   display: inline-block;
-  font-size: small;
-  padding: 0 2px;
-  border-left: 1px solid #aaaaaa;
+}
+
+.clip .time {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.search {
+  margin-bottom: 50px;
 }

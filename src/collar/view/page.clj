@@ -2,7 +2,11 @@
   (:require [collar.db :as db]
             [collar.view.piece :as piece]
             [collar.view.verse :as verse]
+            [config.core :refer [env]]
             [hiccup.page :as hiccup]))
+
+(def entries (db/get-entries db/spec))
+(def tags (db/get-tags db/spec))
 
 (defn template-basic
   [title body]
@@ -18,12 +22,14 @@
     [:h1 "the other head"]
     [:p ":-:-)"]]))
 
-(def new
+(def draft
   (template-basic
-   "new"
+   "draft"
    [:div.page
-    [:h1 "new"]
-    [:textarea "hello"]]))
+    [:h1 "draft"]
+    [:div.draft-title "title" [:input]]
+    [:div.draft-body "body" [:textarea "write"]]
+    [:div.draft-tags [:select (map #(:name %) tags)]]]))
 
 (def pages
   (template-basic
@@ -32,18 +38,18 @@
     [:h1 "pages"]
     verse/search
     [:div.extract
-     (map #(piece/clip %) (db/get-coll "entries"))]]))
+     (map #(piece/clip %) entries)]]))
 
 (def tags
   (template-basic
    "tags"
    [:div.page
     [:h1 "tags"]
-    (map #(piece/tag %) (db/get-coll "tags"))]))
+    (map #(piece/tag %) tags)]))
 
 (def who
   (template-basic
    "who"
    [:div.page
     [:h1 "who"]
-    [:p "agaric"]]))
+    [:p (:body (db/get-entry-by-title db/spec {:title "who"}))]]))
