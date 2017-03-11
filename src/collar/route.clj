@@ -7,7 +7,6 @@
   (compojure/GET "/" [] view/root)
   (compojure/GET "/draft" [] view/draft)
   (compojure/GET "/pages" [] view/pages)
-  (compojure/GET "/tags" [] view/tags)
   (compojure/GET "/who" [] view/who)
   (route/resources "/")
   (route/not-found "not found"))

@@ -1,14 +1,12 @@
 body {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Source Code Pro', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
   background-color: #ffffff;
+  margin: 0;
+  padding: 0;
 }
 
 h1, .nav {
-  font-family: 'Source Sans Pro', sans-serif;
-}
-
-.nav .root a {
-  font-family: 'Source Code Pro', monospace;
+  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6, div {
@@ -31,37 +29,32 @@ a:visited {
   max-width: 800px;
   min-width: 240px;
   margin: 0 auto;
-  padding: 10px;
 }
 
 .nav {
   display: flex;
   justify-content: space-between;
+  padding: 20px;
 }
 
-.nav .root a {
-  color: #c82829;
+.nav a {
+  color: #000000;
 }
 
-.nav .root a:focus, .nav .root a:hover {
-  color: #f5871f;
+.nav a.here {
+  font-weight: 700;
 }
 
 .nav .links a {
-  color: #8959a8;
   margin-left: 20px;
 }
 
-.nav .links a:focus, .nav .links a:hover {
-  color: #a3685a;
+.page {
+  padding: 20px;
 }
 
 .page a {
   color: #4271ae;
-}
-
-.page a:focus, .page a:hover {
-  color: #3e999f;
 }
 
 .tag {

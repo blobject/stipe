@@ -8,48 +8,38 @@
 (def entries (db/get-entries db/spec))
 (def tags (db/get-tags db/spec))
 
-(defn template-basic
-  [title body]
+(defn template
+  [short-title title & text]
   (hiccup/html5
-   (verse/head title)
-   verse/nav
-   body))
+   (verse/head short-title)
+   (verse/nav short-title)
+   [:div.page
+    [:h1 (or title short-title)]
+    text]))
 
 (def root
-  (template-basic
-   "root"
-   [:div.page
-    [:h1 "the other head"]
-    [:p ":-:-)"]]))
+  (template "root" "the other head"
+   [:p ":-:-)"]))
 
 (def draft
-  (template-basic
-   "draft"
-   [:div.page
-    [:h1 "draft"]
-    [:div.draft-title "title" [:input]]
-    [:div.draft-body "body" [:textarea "write"]]
-    [:div.draft-tags [:select (map #(:name %) tags)]]]))
+  (template "draft" false
+   [:div.draft-title
+    [:h2 "title"]
+    [:input]]
+   [:div.draft-body
+    [:h2 "body"]
+    [:textarea "write"]]
+   [:div.draft-tags
+    [:h2 "tags"]
+    [:select (map #(:name %) tags)]]
+   [:button.draft-submit "done"]))
 
 (def pages
-  (template-basic
-   "pages"
-   [:div.page
-    [:h1 "pages"]
-    verse/search
-    [:div.extract
-     (map #(piece/clip %) entries)]]))
-
-(def tags
-  (template-basic
-   "tags"
-   [:div.page
-    [:h1 "tags"]
-    (map #(piece/tag %) tags)]))
+  (template "pages" false
+   verse/search
+   [:div.extract
+    (map #(piece/clip %) entries)]))
 
 (def who
-  (template-basic
-   "who"
-   [:div.page
-    [:h1 "who"]
-    [:p (:body (db/get-entry-by-title db/spec {:title "who"}))]]))
+  (template "who" false
+   [:p (:body (db/get-entry-by-title db/spec {:title "who"}))]))
