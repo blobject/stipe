@@ -5,16 +5,12 @@ body {
   padding: 0;
 }
 
-h1, .nav {
+.nav {
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6, div {
   font-size: medium;
-}
-
-h1 {
-  margin: 20px 0 40px;
 }
 
 a {
@@ -55,6 +51,20 @@ a:visited {
 
 .page a {
   color: #4271ae;
+}
+
+.page-head {
+  margin-bottom: 50px;
+}
+
+h1.title {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.time {
+  color: #808080;
+  text-align: center;
 }
 
 .tag {

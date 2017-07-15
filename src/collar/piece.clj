@@ -1,7 +1,10 @@
-(ns collar.view.verse
-  (:require [clojure.string :as str]
-            [collar.util :as util]
+(ns collar.piece
+  (:require [collar.util :as util]
             [hiccup.page :as hiccup]))
+
+(defn tag [tag]
+  [:div.tag
+   [:div.name (:name tag)]])
 
 (defn head [title]
   [:head
@@ -19,15 +22,9 @@
          :class (cond (= title "root") "here" :else nil)}
      (cond util/is-next? "dev.alocy.be" :else "alocybe")]]
    [:div.links
+    [:a {:href "/about"
+         :class (cond (= title "about") "here" :else nil)}
+     "about"]
     [:a {:href "/pages"
          :class (cond (= title "pages") "here" :else nil)}
-     "pages"]
-    [:a {:href "/who"
-         :class (cond (= title "who") "here" :else nil)}
-     "who"]]])
-
-(def search
-  [:div.search
-   [:div.form
-    [:input {:placeholder "filter"}]
-    [:button {:type "submit"} "apply"]]])
+     "pages"]]])

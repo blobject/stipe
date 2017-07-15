@@ -1,12 +1,19 @@
 (ns collar.route
-  (:require [collar.view :as view]
+  (:require [collar.page :as page]
             [compojure.core :as compojure]
             [compojure.route :as route]))
 
+(def page-names
+  (map #(clojure.string/replace % #"^.*/(.*)\.md$" "$1")
+       page/page-paths))
+
 (compojure/defroutes routes
-  (compojure/GET "/" [] view/root)
-  (compojure/GET "/draft" [] view/draft)
-  (compojure/GET "/pages" [] view/pages)
-  (compojure/GET "/who" [] view/who)
+  (compojure/GET "/" [] page/root)
+  (compojure/GET "/pages" [] page/pages)
+  (compojure/GET "/:pg" [pg]
+                 (let [p (clojure.string/lower-case pg)]
+                   (if (some #{p} page-names)
+                     (page/flip p)
+                     (str "\"" pg "\" not found"))))
   (route/resources "/")
   (route/not-found "not found"))
