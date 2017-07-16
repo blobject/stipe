@@ -3,16 +3,16 @@
             [compojure.core :as compojure]
             [compojure.route :as route]))
 
-(def page-names
-  (map #(clojure.string/replace % #"^.*/(.*)\.md$" "$1")
-       page/page-paths))
+(def page-names (map page/basename page/page-files))
 
 (compojure/defroutes routes
   (compojure/GET "/" [] page/root)
+  (compojure/GET "/about" [] (page/flip "about"))
   (compojure/GET "/pages" [] page/pages)
-  (compojure/GET "/:pg" [pg]
+  (compojure/GET "/page/:pg" [pg]
                  (let [p (clojure.string/lower-case pg)]
-                   (if (some #{p} page-names)
+                   (if (and (some #{p} page-names)
+                            (not (some #{p} page/specials)))
                      (page/flip p)
                      (str "\"" pg "\" not found"))))
   (route/resources "/")

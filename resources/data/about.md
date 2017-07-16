@@ -1,14 +1,14 @@
 Title: about me + site
 Date: 1500155424
 
-## me
+# me
 
 known as:
 - agaric
 - b
 
 email:
-- agaric at protonmail dot com
+- <span>agaric@<span class="hide">null</span>protonmail.com</span>
 
 ref:
 - [alocy.be](https://alocy.be)
@@ -17,10 +17,10 @@ ref:
 pgp:
 - 0608 6167 2485 0471 6342  09CD 6607 1DB5 CB6E BCCF
 
-## site
+# site
 
-technology:
-- *wip*
+naming:
+- *alocybe:* A hybrid word after the Latin *alius* (= other) and the Greek *kybe* (= head).
 
-copyright:
-- *wip*
+technical:
+- <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />All original material contributed to this site, unless otherwise stated, is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
