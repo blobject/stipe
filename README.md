@@ -19,4 +19,4 @@
 
 - [leiningen](https://github.com/technomancy/leiningen) 2.0 or above
     - `lein ring server [PORT]`
-- clojure, compojure, hiccup, ring, et al.
+- clojure, compojure, datomic, hiccup, om, ring, et al.

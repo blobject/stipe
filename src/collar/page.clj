@@ -7,6 +7,8 @@
             [hiccup.page :as hiccup]
             [markdown.core :as md]))
 
+(def page-files-path "db/")
+
 (def specials ["about"])
 
 (defn timestamp [time]
@@ -33,11 +35,11 @@
 
 (def page-files
   (sort (filter #(.endsWith (clojure.string/lower-case %) ".md")
-          (file-seq (clojure.java.io/file "resources/data/")))))
+          (file-seq (clojure.java.io/file page-files-path)))))
 
 (defn flip [page]
-  (let [page-file (clojure.java.io/file (str "resources/data/" page ".md"))
-        page-data (md/md-to-html-string-with-meta (slurp page-file))
+  (let [page-file (clojure.java.io/file (str page-files-path page ".md"))
+        page-data (md/md-to-html-string-with-meta (slurp page-file) :reference-links? true)
         meta (:metadata page-data)
         short-title (clojure.string/replace page "_" " ")
         title (if (some? (:title meta)) (first (:title meta)) short-title)

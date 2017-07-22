@@ -9,20 +9,36 @@ body {
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-.hide {
-  display: none;
+a {
+  text-decoration: none;
+}
+
+a:focus, a:hover {
+  color: blue !important;
+}
+
+a:visited {
+  color: inherit;
 }
 
 h1, h2, h3, h4, h5, h6, div {
   font-size: medium;
 }
 
-a {
-  text-decoration: none;
+h2 {
+  color: #303030;
 }
 
-a:visited {
-  color: inherit;
+h3 {
+  color: #606060;
+}
+
+h4, h5, h6 {
+  color: #909090;
+}
+
+.hide {
+  display: none;
 }
 
 .nav, .page {
