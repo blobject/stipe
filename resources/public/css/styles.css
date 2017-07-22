@@ -1,7 +1,7 @@
 body {
   font-family: 'Source Code Pro', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
   background-color: #ffffff;
-  margin: 0;
+  margin: 0 0 50px;
   padding: 0;
 }
 
@@ -13,10 +13,6 @@ a {
   text-decoration: none;
 }
 
-a:focus, a:hover {
-  color: blue !important;
-}
-
 a:visited {
   color: inherit;
 }
@@ -26,15 +22,24 @@ h1, h2, h3, h4, h5, h6, div {
 }
 
 h2 {
-  color: #303030;
-}
-
-h3 {
   color: #606060;
 }
 
-h4, h5, h6 {
+h3, h5, h6 {
   color: #909090;
+}
+
+hr {
+  border-top: none;
+  border-color: #e0e0e0;
+}
+
+img {
+  max-width: 100%;
+}
+
+ul {
+  margin: 10px 0 30px;
 }
 
 .hide {
@@ -70,7 +75,11 @@ h4, h5, h6 {
 }
 
 .page a {
-  color: #4271ae;
+  color: #3f51b5;
+}
+
+.page a:focus, .page a:hover {
+  color: #f50057;
 }
 
 .page-head {
