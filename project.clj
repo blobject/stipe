@@ -6,15 +6,12 @@
                  [org.clojure/clojurescript "1.9.671"]
                  [compojure "1.6.0"]
                  [yogthos/config "0.8"]
-                 [com.datomic/datomic-free "0.9.5561.50"]
-                 [expectations "2.2.0-beta1"]
                  [hiccup "1.0.5"]
                  [markdown-clj "0.9.99"]
                  [ring/ring-defaults "0.3.0"]
                  [ring/ring-jetty-adapter "1.6.2"]
                  [clj-time "0.14.0"]]
-  :plugins [[lein-autoexpect "1.9.0"]
-            [lein-figwheel "0.5.11"]
+  :plugins [[lein-figwheel "0.5.11"]
             [lein-ring "0.12.0"]]
   :ring {:handler collar.core/app}
   :main collar.core
