@@ -17,6 +17,22 @@ a:visited {
   color: inherit;
 }
 
+blockquote {
+  border-left: 4px solid #e0e0e0;
+  margin: 0;
+  padding: 0 20px;
+}
+
+blockquote p {
+  color: #606060
+}
+
+code {
+  font-size: 15px;
+  background-color: #e8e8e8;
+  padding: 2px 3px;
+}
+
 h1, h2, h3, h4, h5, h6, div {
   font-size: medium;
 }
@@ -25,8 +41,9 @@ h2 {
   color: #606060;
 }
 
-h3, h5, h6 {
+h3, h4, h5, h6 {
   color: #909090;
+  margin: 35px 0 25px;
 }
 
 hr {

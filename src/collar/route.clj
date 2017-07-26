@@ -5,11 +5,11 @@
 
 (compojure/defroutes routes
   (compojure/GET "/" []
-                 page/root)
+                 page/root-page)
   (compojure/GET "/about" []
                  (page/flip "about"))
   (compojure/GET "/pages" []
-                 page/pages)
+                 (page/pages-page))
   (compojure/GET "/page/:p" [p]
                  (page/flip (clojure.string/lower-case p)))
   (route/resources "/")
