@@ -1,13 +1,10 @@
 # collar
 
-[home]: https://alocy.be
-[license]: https://raw.githubusercontent.com/agarick/collar/master/LICENSE
-
 ### about
 
 - purpose:
-    - an exercise after http://clojure-doc.org/articles/tutorials/basic_web_development.html and https://github.com/omcljs/om/wiki/Basic-Tutorial.
-    - a space to play around, test ideas, compend, and exhibit.
+    - an exercise after http://clojure-doc.org/articles/tutorials/basic_web_development.html.
+    - a space to play around, test ideas, compile, and exhibit.
 - distribution:
     - [alocy.be][home]
 - license:
@@ -19,4 +16,7 @@
 
 - [leiningen](https://github.com/technomancy/leiningen) 2.0 or above
     - `lein ring server [PORT]`
-- clojure, compojure, datomic, hiccup, om, ring, et al.
+- clojure, compojure, hiccup, ring, et al.
+
+[home]: https://alocy.be
+[license]: https://raw.githubusercontent.com/agarick/collar/master/LICENSE

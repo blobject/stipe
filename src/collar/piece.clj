@@ -1,10 +1,6 @@
 (ns collar.piece
-  (:require [collar.util :as util]
-            [hiccup.page :as hiccup]))
-
-(defn tag [tag]
-  [:div.tag
-   [:div.name (:name tag)]])
+  (:require [collar.util :as u]
+            [hiccup.page :as h]))
 
 (defn head [title]
   [:head
@@ -13,18 +9,24 @@
            :content "width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0"}]
    [:link {:href "https://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro"
            :rel "stylesheet"}]
-   (hiccup/include-css "/css/styles.css")])
+   (h/include-css "/css/styles.css")])
 
 (defn nav [title]
   [:div.nav
    [:div.root
-    [:a {:href "/"
-         :class (cond (= title "root") "here" :else nil)}
-     (cond util/is-next? "dev.alocy.be" :else "alocybe")]]
+    (if u/is-next?
+      [:span
+       [:a {:href "/"
+            :class (if (= title "root") "here")}
+        "dev."]
+       [:a {:href u/site-path} "alocy.be"]]
+      [:a {:href "/"
+           :class (if (= title "root") "here")}
+       "alocybe"])]
    [:div.links
     [:a {:href "/about"
-         :class (cond (= title "about") "here" :else nil)}
+         :class (if (= title "about") "here")}
      "about"]
     [:a {:href "/pages"
-         :class (cond (= title "pages") "here" :else nil)}
+         :class (if (= title "pages") "here")}
      "pages"]]])

@@ -1,15 +1,15 @@
 (ns collar.core
-  (:require [collar.route :as route]
-            [config.core :refer [env]]
-            [ring.adapter.jetty :as jetty]
-            [ring.middleware.defaults :as middleware])
+  (:require [collar.route :as r]
+            [config.core :as c]
+            [ring.adapter.jetty :as j]
+            [ring.middleware.defaults :as m])
   (:gen-class))
 
 (def app
-  (middleware/wrap-defaults
-   route/routes
-   middleware/site-defaults))
+  (m/wrap-defaults
+   r/routes
+   m/site-defaults))
 
 (defn -main [& [port]]
-  (jetty/run-jetty #'app {:port (:port env)
-                          :join? false}))
+  (j/run-jetty #'app {:port (:port c/env)
+                      :join? false}))
