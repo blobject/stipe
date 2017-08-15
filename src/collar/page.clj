@@ -92,7 +92,7 @@
   "Construct native representation of file."
   [file]
   (let [name (clojure.string/replace (.getName file) #"\.md$" "")
-        short (clojure.string/replace name "_" " ")
+        short (clojure.string/replace name "-" " ")
         data (get-file file)
         meta (:metadata data)]
     {:name name
