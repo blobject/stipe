@@ -28,6 +28,9 @@
     [:a {:href "/about"
          :class (if (= title "about") "here")}
      "about"]
+    [:a {:href "/apps"
+         :class (if (= title "apps") "here")}
+     "apps"]
     [:a {:href "/pages"
          :class (if (= title "pages") "here")}
      "pages"]]])

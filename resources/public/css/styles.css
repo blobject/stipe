@@ -169,6 +169,10 @@ ul {
   font-weight: 400;
 }
 
+.small {
+  font-size: small;
+}
+
 .tag {
   display: inline-block;
   font-size: small;

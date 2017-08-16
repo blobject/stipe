@@ -11,7 +11,7 @@
 
 (def pages-scope "/pages")
 (def page-scope "/page")
-(def specials ["about"])
+(def specials ["about" "apps"])
 
 ;; template-related
 

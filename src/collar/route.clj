@@ -8,6 +8,8 @@
          p/root-page)
   (c/GET "/about" []
          (p/flip "about"))
+  (c/GET "/apps" []
+         (p/flip "apps"))
   (c/GET "/pages" [tag]
          (p/pages-page tag))
   (c/GET "/page/:p" [p]
