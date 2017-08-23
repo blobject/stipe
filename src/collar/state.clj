@@ -1,17 +1,36 @@
 (ns collar.state
-  (:require [collar.util :as u]))
+  (:require [collar.util :as u]
+            [clojure.java.io :as io]
+            [clojure.string :as str]
+            [markdown.core :as md]))
 
 (defonce state (atom {}))
 
-; Currently, only the "last-modified time" of the db folder is saved.
-; This is used, for example, to determine whether to re-read files in db.
-(defn state-changed?
-  "Whether global state has changed."
-  []
-  (let [db-mod (.lastModified (clojure.java.io/file u/db-path))]
-    (if (not= (:db-mod @state) db-mod)
-      (do
-        (swap! state assoc :db-mod db-mod)
-        true)
-      false)))
+(defn valid? [file]
+  (and
+   (-> file .getName str/lower-case (.endsWith ".md"))
+   (> (.length file) 0)))
 
+(defn get-name [file]
+  (-> file .getName (str/replace #"\.md$" "")))
+
+(defn upstate-f [file]
+  (let [lmod (.lastModified file)
+        name (get-name file)
+        old ((keyword name) (:data @state))]
+    (if (= (:lmod old) lmod)
+      old
+      {:lmod lmod
+       :data (md/md-to-html-string-with-meta
+              (slurp file) :reference-links? true)
+       :name name})))
+
+(defn upstate! []
+  (let [dir (io/file u/db-path)
+        lmod (.lastModified dir)
+        old @state]
+    (if (= (:lmod old) lmod)
+      old
+      (let [files (->> dir .listFiles (filter valid?) sort)
+            raws (zipmap (map get-name files) (map upstate-f files))]
+        (reset! state {:lmod lmod :data raws})))))

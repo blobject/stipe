@@ -5,14 +5,14 @@
 
 (c/defroutes routes
   (c/GET "/" []
-         p/root-page)
+         p/flip-root)
   (c/GET "/about" []
          (p/flip "about"))
   (c/GET "/apps" []
          (p/flip "apps"))
   (c/GET "/pages" [tag]
-         (p/pages-page tag))
+         (p/flip-pages tag))
   (c/GET "/page/:p" [p]
          (p/flip (clojure.string/lower-case p)))
   (r/resources "/")
-  (r/not-found "not found"))
+  (r/not-found (p/create-page {:short "page not found"})))
