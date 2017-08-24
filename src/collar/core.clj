@@ -1,7 +1,8 @@
 (ns collar.core
   (:require [collar.route :as r]
+            [aleph.http :as a]
+            [aleph.netty :as an]
             [config.core :as c]
-            [ring.adapter.jetty :as j]
             [ring.middleware.defaults :as m])
   (:gen-class))
 
@@ -11,5 +12,5 @@
    m/site-defaults))
 
 (defn -main [& [port]]
-  (j/run-jetty #'app {:port (:port c/env)
-                      :join? false}))
+  (an/wait-for-close
+   (a/start-server #'app {:port (:port c/env)})))
