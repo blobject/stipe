@@ -7,7 +7,7 @@
 
 (defn head [title]
   [:head
-   [:title (str title " - alocy.be")]
+   [:title (str title " - " u/site-name)]
    [:meta {:name "viewport"
            :content "width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0"}]
    (if u/is-master?
@@ -22,7 +22,7 @@
     (if u/is-next?
       [:span
        [:a {:href "/" :class (here title "root")} "dev."]
-       [:a {:href u/site-path} "alocy.be"]]
+       [:a {:href u/site-path} u/site-name]]
       [:a {:href "/" :class (here title "root")} "alocybe"])]
    [:div.links
     [:a {:href "/about" :class (here title "about")} "about"]

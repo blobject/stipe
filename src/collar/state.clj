@@ -1,18 +1,18 @@
 (ns collar.state
   (:require [collar.util :as u]
             [clojure.java.io :as io]
-            [clojure.string :as str]
+            [clojure.string :as s]
             [markdown.core :as md]))
 
 (defonce state (atom {}))
 
 (defn valid? [file]
   (and
-   (-> file .getName str/lower-case (.endsWith ".md"))
+   (-> file .getName s/lower-case (.endsWith ".md"))
    (> (.length file) 0)))
 
 (defn get-name [file]
-  (-> file .getName (str/replace #"\.md$" "")))
+  (-> file .getName (s/replace #"\.md$" "")))
 
 (defn upstate-f [file]
   (let [lmod (.lastModified file)

@@ -1,11 +1,11 @@
 (ns collar.page
   (:require [collar.piece :as p]
-            [collar.state :as s]
+            [collar.state :as state]
             [collar.util :as u]
             [clj-time.coerce :as tr]
             [clj-time.core :as tc]
             [clj-time.format :as tf]
-            [clojure.string :as str]
+            [clojure.string :as s]
             [hiccup.page :as h]
             [hiccup.util :as hu]))
 
@@ -16,16 +16,14 @@
 ;; template-related
 
 (defn timestamp [secs]
-  (if-not (number? secs)
-    nil
-    (tf/unparse
-     (tf/with-zone
-       (tf/formatter "yyyy-MM-dd")
-       (tc/time-zone-for-id "UTC"))
-     (tr/from-long secs))))
+  (tf/unparse
+   (tf/with-zone
+     (tf/formatter "yyyy-MM-dd")
+     (tc/time-zone-for-id "UTC"))
+   (tr/from-long secs)))
 
 (defn get-tag-names [tag-string]
-  (-> tag-string (str/split #"\s*,\s*") sort))
+  (-> tag-string (s/split #"\s*,\s*") sort))
 
 (defn create-tag [tagname class]
   [:a {:href (if (= class "clear")
@@ -57,7 +55,7 @@
 (defn get-page [raw-page]
   (let [{:keys [data name lmod]} raw-page
         {:keys [title date keywords]} (:metadata data)
-        short (str/replace name "-" " ")]
+        short (s/replace name "-" " ")]
     {:name name
      :short short
      :title (if (seq title) (first title) short)
@@ -67,7 +65,7 @@
      :text (:html data)}))
 
 (defn get-pages []
-  (:data (s/upstate!)))
+  (:data (state/upstate!)))
 
 ;; route-related
 
