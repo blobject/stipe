@@ -1,5 +1,6 @@
 (ns collar.route
   (:require [collar.page :as p]
+            [collar.piece :as pi]
             [compojure.core :as c]
             [compojure.route :as r]))
 
@@ -15,4 +16,4 @@
   (c/GET "/page/:p" [p]
          (p/flip (clojure.string/lower-case p)))
   (r/resources "/")
-  (r/not-found (p/create-page {:short "page not found"})))
+  (r/not-found (pi/create-page {:short "page not found"})))

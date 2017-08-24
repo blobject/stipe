@@ -2,55 +2,10 @@
   (:require [collar.piece :as p]
             [collar.state :as state]
             [collar.util :as u]
-            [clj-time.coerce :as tr]
-            [clj-time.core :as tc]
-            [clj-time.format :as tf]
-            [clojure.string :as s]
-            [hiccup.page :as h]
-            [hiccup.util :as hu]))
-
-(def pages-scope "/pages")
-(def page-scope "/page")
-(def root-scoped ["about" "apps"])
-
-;; template-related
-
-(defn timestamp [secs]
-  (tf/unparse
-   (tf/with-zone
-     (tf/formatter "yyyy-MM-dd")
-     (tc/time-zone-for-id "UTC"))
-   (tr/from-long secs)))
+            [clojure.string :as s]))
 
 (defn get-tag-names [tag-string]
   (-> tag-string (s/split #"\s*,\s*") sort))
-
-(defn create-tag [tagname class]
-  [:a {:href (if (= class "clear")
-               pages-scope
-               (str pages-scope "?tag=" (hu/url-encode tagname)))}
-   [:div.tag (if class {:class class}) tagname]])
-
-(defn create-page [pre & text]
-  (let [{:keys [short title time lmod tags]} pre]
-    (h/html5
-     (p/head short)
-     (p/nav short)
-     [:div.page
-      [:div.page-head
-       [:h1.title (or title short)]
-       (if (seq tags)
-         [:div.tags (->> tags
-                         (map #(create-tag % "flat"))
-                         (interpose ", "))])
-       (if (some? time) [:div.time time])
-       (if (and (some? lmod) (not= time lmod)) [:div.lmod lmod])]
-      [:div.page-body text]])))
-
-;; file-related
-
-(defn root-scoped? [pagename]
-  (some #{pagename} root-scoped))
 
 (defn get-page [raw-page]
   (let [{:keys [data name lmod]} raw-page
@@ -67,58 +22,35 @@
 (defn get-pages []
   (:data (state/upstate!)))
 
-;; route-related
-
-(defn flip [pagename]
-  (let [which (-> (get-pages) (get pagename))
+(defn flip [name]
+  (let [which (-> (get-pages) (get name))
         page (if which (get-page which))]
-    (if page
-      (create-page
+    (if-not page
+      (p/create-page
+       {:short "not found"}
+       (p/notfound name))
+      (p/create-page
        {:short (:short page)
         :title (:title page)
-        :time (if (:time page) (timestamp (:time page)))
-        :lmod (timestamp (:lmod page))
+        :time (if (:time page) (u/timestamp (:time page)))
+        :lmod (u/timestamp (:lmod page))
         :tags (:tags page)}
-       (:text page))
-      (create-page
-       {:short "not found"}
-       [:span [:em "no page called "] pagename]))))
+       (:text page)))))
 
 (def flip-root
-  (create-page
+  (p/create-page
    {:short "root"
     :title "welcome"}
-   [:p ":-:-)"]))
+   p/root))
 
 (defn flip-pages [query-tag]
-  (let [all-pages (->> (get-pages) (map peek) (map get-page))
-        all-tags (->> all-pages (map :tags) flatten distinct sort)
-        pages (if query-tag
-                (filter #(some #{query-tag} (:tags %)) all-pages)
-                all-pages)
-        page-count (count pages)]
-    (create-page
+  (let [pages (->> (get-pages) (map peek) (map get-page))
+        tags (->> pages (map :tags) flatten distinct sort)
+        which (if query-tag
+                (filter #(some #{query-tag} (:tags %)) pages)
+                pages)
+        count (count which)]
+    (p/create-page
      {:short "pages"}
-     [:ul.tag-list
-      (if query-tag (create-tag "tags" "clear") "tags") ": "
-      (for [tag all-tags]
-        (create-tag tag (if (= tag query-tag) "active")))]
-     [:div.page-count
-      page-count " page" (if (not= page-count 1) "s")]
-     [:ul.page-list
-      {:class (if (= page-count 0) "pageless")}
-      (if (= page-count 0)
-        [:span [:em "no page tagged "] query-tag]
-        (for [page pages]
-          (let [{:keys [name, short, tags, lmod]} page
-                time (if lmod
-                       (timestamp lmod)
-                       (timestamp (:time page)))
-                link (if (root-scoped? name)
-                       name
-                       (str page-scope "/" name))]
-            [:li
-             [:a {:href link}
-              [:span.page-name short] " " [:span.time time]]
-             (if (seq tags)
-               [:div.tags (for [tag tags] (create-tag tag nil))])])))])))
+     (p/taglist query-tag count tags)
+     (p/pagelist query-tag count which))))

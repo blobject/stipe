@@ -58,6 +58,10 @@ img {
   max-width: 100%;
 }
 
+p {
+  word-wrap: break-word;
+}
+
 ul {
   margin: 10px 0 30px;
 }
@@ -80,6 +84,7 @@ ul {
 
 .nav a {
   color: #606060;
+  padding: 2px;
 }
 
 .nav a:focus, .nav a:hover {
@@ -91,7 +96,7 @@ ul {
 }
 
 .nav .links a {
-  margin-left: 20px;
+  margin-left: 26px;
 }
 
 .page {
@@ -111,7 +116,7 @@ ul {
 }
 
 .page-head h1.title {
-  margin: 20px 0 10px;
+  margin: 20px 0 50px;
   text-align: center;
 }
 
@@ -136,6 +141,11 @@ ul {
   margin: 50px 0 30px;
 }
 
+.welcome {
+  color: #e0e0e0;
+  line-height: 1.5em;
+}
+
 .tag-list, .page-list {
   list-style: none;
   padding: 0;
@@ -148,7 +158,7 @@ ul {
 }
 
 .page-count {
-  margin: 10px 10px 40px;
+  margin: 10px 0 40px;
 }
 
 .page-list li {
