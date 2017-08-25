@@ -66,6 +66,14 @@ ul {
   margin: 10px 0 30px;
 }
 
+li {
+  margin: 10px 0;
+}
+
+li ul {
+  margin: 10px 0 20px;
+}
+
 .hide {
   display: none;
 }
@@ -93,6 +101,26 @@ ul {
 
 .nav a.here {
   font-weight: 700;
+}
+
+.nav .root {
+  margin-right: 30px;
+  white-space: nowrap;
+}
+
+.nav .cup {
+  margin-left: -5px;
+  margin-right: 5px;
+  vertical-align: top;
+  opacity: .3;
+}
+
+.nav a:focus img.cup, .nav a:hover img.cup {
+  opacity: 1;
+}
+
+.nav a.here .cup {
+  opacity: .5;
 }
 
 .nav .links a {
@@ -166,8 +194,8 @@ ul {
 }
 
 .page-list li {
-  margin: 10px 0;
-  padding: 30px 10px;
+  margin: 15px 0;
+  padding: 20px 10px;
 }
 
 .page-list li:focus, .page-list li:hover {

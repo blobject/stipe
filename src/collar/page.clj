@@ -4,9 +4,6 @@
             [collar.util :as u]
             [clojure.string :as s]))
 
-(defn get-tag-names [tag-string]
-  (-> tag-string (s/split #"\s*,\s*") sort))
-
 (defn get-page [raw-page]
   (let [{:keys [data name lmod]} raw-page
         {:keys [title date keywords]} (:metadata data)
@@ -14,28 +11,30 @@
     {:name name
      :short short
      :title (if (seq title) (first title) short)
-     :tags (if (seq keywords) (-> keywords first get-tag-names) [])
+     :tags (if (seq keywords)
+             (-> keywords first (s/split #"\s*,\s*") set)
+             #{})
      :time (if (seq date) (-> date first Integer/parseInt (* 1000)))
      :lmod lmod
      :text (:html data)}))
 
 (defn get-pages []
-  (:data (state/upstate!)))
+  (state/upstate))
 
 (defn flip [name]
-  (let [which (-> (get-pages) (get name))
-        page (if which (get-page which))]
-    (if-not page
+  (let [which (-> (get-pages) (get name))]
+    (if-not which
       (p/create-page
        {:short "not found"}
        (p/notfound name))
-      (p/create-page
-       {:short (:short page)
-        :title (:title page)
-        :time (if (:time page) (u/timestamp (:time page)))
-        :lmod (u/timestamp (:lmod page))
-        :tags (:tags page)}
-       (:text page)))))
+      (let [{:keys [short title time lmod tags text]} (get-page which)]
+        (p/create-page
+         {:short short
+          :title title
+          :time (if time (u/timestamp time))
+          :lmod (u/timestamp lmod)
+          :tags tags}
+         text)))))
 
 (def flip-root
   (p/create-page
@@ -45,9 +44,9 @@
 
 (defn flip-pages [query-tag]
   (let [pages (->> (get-pages) (map peek) (map get-page))
-        tags (->> pages (map :tags) flatten distinct sort)
+        tags (->> pages (map :tags) (apply clojure.set/union))
         which (if query-tag
-                (filter #(some #{query-tag} (:tags %)) pages)
+                (filter #(get (:tags %) query-tag) pages)
                 pages)
         count (count which)]
     (p/create-page
