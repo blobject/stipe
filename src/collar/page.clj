@@ -26,7 +26,8 @@
     (if-not which
       (p/create-page
        {:short "not found"}
-       (p/notfound name))
+       nil
+       (p/not-found name))
       (let [{:keys [short title time lmod tags text]} (get-page which)]
         (p/create-page
          {:short short
@@ -34,12 +35,14 @@
           :time (if time (u/timestamp time))
           :lmod (u/timestamp lmod)
           :tags tags}
+         (p/foot name)
          text)))))
 
 (def flip-root
   (p/create-page
    {:short "root"
     :title "welcome"}
+   nil
    p/root))
 
 (defn flip-pages [query-tag]
@@ -48,8 +51,10 @@
         which (if query-tag
                 (filter #(get (:tags %) query-tag) pages)
                 pages)
-        count (count which)]
+        count (count which)
+        short "pages"]
     (p/create-page
-     {:short "pages"}
-     (p/taglist query-tag count tags)
-     (p/pagelist query-tag count which))))
+     {:short short}
+     (p/foot short)
+     (p/tags-list query-tag count tags)
+     (p/pages-list query-tag count which))))

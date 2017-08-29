@@ -26,6 +26,5 @@
 
 (defn upstate []
   (let [files (->> (io/file u/db-path) .listFiles (filter valid?) sort)
-        new (zipmap (map get-name files) (map upstate-f files))
-        old @state]
-    (swap! state #(merge % new))))
+        new (zipmap (map get-name files) (map upstate-f files))]
+    (reset! state new)))

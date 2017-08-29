@@ -4,14 +4,18 @@
             [clj-time.format :as tf]
             [config.core :as c]))
 
-(def site-name "alocy.be")
-(def site-path (str "https://" site-name))
-(def db-path "db/")
-
 (def env (:env c/env))
 (def is-dev? (= env "development"))
 (def is-next? (= env "next"))
 (def is-master? (= env "master"))
+
+(def site-name
+  (cond
+    is-dev? (str "localhost:" (:port c/env))
+    is-next? "dev.alocy.be"
+    is-master? "alocy.be"))
+(def site-path (str "https://" site-name))
+(def db-path "db/")
 
 (defn timestamp [secs]
   (tf/unparse

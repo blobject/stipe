@@ -1,6 +1,6 @@
 body {
   background-color: #ffffff;
-  margin: 0 0 50px;
+  margin: 0;
   padding: 0;
 }
 
@@ -38,6 +38,10 @@ code {
 
 h1, h2, h3, h4, h5, h6, div {
   font-size: medium;
+}
+
+h1 {
+  color: #000000;
 }
 
 h2 {
@@ -78,7 +82,7 @@ li ul {
   display: none;
 }
 
-.nav, .page {
+.nav, .page, .foot {
   max-width: 800px;
   min-width: 240px;
   margin: 0 auto;
@@ -169,6 +173,7 @@ li ul {
 .page-body h1 {
   margin: 60px 0 30px;
 }
+
 .page-body h2 {
   margin: 50px 0 30px;
 }
@@ -178,37 +183,85 @@ li ul {
   line-height: 1.5em;
 }
 
-.tag-list, .page-list {
+.tags-list, .pages-list {
   list-style: none;
   padding: 0;
 }
 
-.tag-list, .page-count {
+.tags-list, .page-count {
   font-size: small;
   color: #b0b0b0;
   margin: 0 10px;
+}
+
+.tags-list li {
+  display: inline;
 }
 
 .page-count {
   margin: 10px 0 40px;
 }
 
-.page-list li {
+.pages-list li {
   margin: 15px 0;
-  padding: 20px 10px;
+  padding: 15px 0;
 }
 
-.page-list li:focus, .page-list li:hover {
+.pages-list li:focus, .pages-list li:hover {
   background-color: #f8f8f8;
 }
 
-.page-list .page-name {
-  font-weight: 700;
+.pages-list .page-link {
+  padding: 10px;
+  line-height: 2em;
 }
 
-.page-list .time {
+.pages-list .time {
   font-size: small;
   font-weight: 400;
+  margin-right: 1em;
+}
+
+.pages-list .name {
+  font-weight: 700;
+  margin-right: 1em;
+}
+
+.pages-list ul.tags {
+  display: inline-block;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pages-list ul.tags li {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+.foot {
+  font-size: smaller;
+  margin-top: 50px;
+  padding: 50px 20px;
+  text-align: right;
+  opacity: .3;
+}
+
+.foot:focus, .foot:hover {
+  opacity: .6;
+}
+
+.foot a {
+  color: #0000ff;
+}
+
+.foot a:focus, .foot a:hover {
+  font-weight: bold;
+}
+
+.foot a.froot {
+  color: #000000;
 }
 
 .small {
@@ -225,9 +278,15 @@ li ul {
   padding: 1px 2px;
 }
 
-.tag:focus, .tag:hover, .tag.active {
+.tag:focus, .tag:hover {
   color: #202020;
   border-color: #202020;
+}
+
+.tag.active {
+  color: #ffffff;
+  background-color: #808080;
+  border-color: #808080;
 }
 
 .tag.clear {
