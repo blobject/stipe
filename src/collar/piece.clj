@@ -6,7 +6,7 @@
 
 (def pages-scope "/pages")
 (def page-scope "/page")
-(def root-scoped #{"about" "apps" "pages"})
+(def root-scoped #{"about" "dev" "pages"})
 
 (defn get-link [name]
   (if (root-scoped name)
@@ -34,7 +34,7 @@
        (if u/is-master? "alocybe" u/site-name)]]
      [:div.links
       [:a {:href "/about" :class (here "about")} "about"]
-      [:a {:href "/apps" :class (here "apps")} "apps"]
+      [:a {:href "/dev" :class (here "dev")} "dev"]
       [:a {:href "/pages" :class (here "pages")} "pages"]]]))
 
 (defn foot [title]

@@ -8,8 +8,8 @@
          p/flip-root)
   (c/GET "/about" []
          (p/flip "about"))
-  (c/GET "/apps" []
-         (p/flip "apps"))
+  (c/GET "/dev" []
+         (p/flip "dev"))
   (c/GET "/pages" [tag]
          (p/flip-pages tag))
   (c/GET "/page/:p" [p]
