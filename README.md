@@ -1,6 +1,6 @@
 # collar
 
-![alocybe](https://alocy.be/img/alocybe-64.png "alocybum")
+![alocybe](https://alocy.be/img/alocybe-64.png "agaric")
 
 ### about
 
