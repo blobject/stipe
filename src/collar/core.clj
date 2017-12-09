@@ -12,5 +12,6 @@
    m/site-defaults))
 
 (defn -main [& [port]]
+  (println "starting alocybe")
   (an/wait-for-close
    (a/start-server #'app {:port (:port c/env)})))
