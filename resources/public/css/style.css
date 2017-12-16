@@ -242,7 +242,7 @@ li ul {
 }
 
 .foot {
-  font-size: smaller;
+  font-size: small;
   margin-top: 50px;
   padding: 50px 20px;
   text-align: right;
@@ -263,10 +263,6 @@ li ul {
 
 .foot a.froot {
   color: #000000;
-}
-
-.small {
-  font-size: small;
 }
 
 .tag {
