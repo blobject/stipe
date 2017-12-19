@@ -82,7 +82,7 @@
 
 (defn tags-list [query-tag count tags]
   [:ul.tags-list
-   (if query-tag (create-tag "tags" "clear") "tags") ": "
+   (if query-tag (create-tag "all tags" "clear") "tags") ": "
    (let [li (fn [tag] [:li (create-tag tag (if (= tag query-tag) "active"))])]
      (map li (sort tags)))
    [:div.page-count
@@ -95,12 +95,12 @@
      [:span [:em "no page tagged "] query-tag]
      (for [page pages]
        (let [{:keys [name, short, tags, lmod]} page
-             time (if lmod
-                    (u/timestamp lmod)
-                    (u/timestamp (:time page)))]
+             time (u/timestamp (:time page))
+             lmod (u/timestamp (:lmod page))]
          [:li
           [:a.page-link {:href (get-link name)}
-           [:span.time time] " " [:span.name short]]
+           [:div.page-time [:div.time time] [:div.lmod lmod]]
+           [:div.name short]]
           (if (seq tags)
             [:ul.tags
              (let [li (fn [tag] [:li (create-tag tag nil)])]
