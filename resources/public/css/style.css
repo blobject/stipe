@@ -81,6 +81,14 @@ li ul {
   display: none;
 }
 
+.small, .tag,
+.nav a, .foot,
+.page-head .tags, .page-head .time, .page-head .lmod,
+.tags-list, .page-count,
+.pages-list .page-time .time, .pages-list .page-time .lmod {
+  font-size: small;
+}
+
 .nav, .page, .foot {
   max-width: 800px;
   min-width: 240px;
@@ -95,7 +103,6 @@ li ul {
 }
 
 .nav a {
-  font-size: small;
   color: #606060;
   padding: 2px;
 }
@@ -154,7 +161,6 @@ li ul {
 }
 
 .page-head .tags, .page-head .time, .page-head .lmod {
-  font-size: small;
   text-align: center;
 }
 
@@ -190,7 +196,6 @@ li ul {
 }
 
 .tags-list, .page-count {
-  font-size: small;
   color: #b0b0b0;
   margin: 0 10px;
 }
@@ -223,7 +228,6 @@ li ul {
 }
 
 .pages-list .page-time .time, .pages-list .page-time .lmod {
-  font-size: small;
   font-weight: 400;
 }
 
@@ -255,7 +259,6 @@ li ul {
 }
 
 .foot {
-  font-size: small;
   margin-top: 50px;
   padding: 50px 20px;
   text-align: right;
@@ -280,7 +283,6 @@ li ul {
 
 .tag {
   display: inline-block;
-  font-size: small;
   color: #808080;
   border: 1px solid #b0b0b0;
   border-radius: 2px;
