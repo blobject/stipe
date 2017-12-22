@@ -81,10 +81,9 @@ li ul {
   display: none;
 }
 
-.small, .tag,
-.nav a, .foot,
+.tag, .nav a, .foot,
 .page-head .tags, .page-head .time, .page-head .lmod,
-.tags-list, .page-count,
+.dev-item ul, .tags-list, .page-count,
 .pages-list .page-time .time, .pages-list .page-time .lmod {
   font-size: small;
 }
@@ -188,6 +187,14 @@ li ul {
 .welcome {
   color: #e0e0e0;
   line-height: 1.5em;
+}
+
+.dev-item h1 {
+  margin-bottom: 20px;
+}
+
+.dev-item li {
+  margin: 5px 0;
 }
 
 .tags-list, .pages-list {
