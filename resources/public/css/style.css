@@ -77,10 +77,23 @@ li ul {
   margin: 10px 0 20px;
 }
 
+table {
+  border-collapse: collapse;
+}
+
+table, table th, table td {
+  border: 1px solid #b0b0b0;
+}
+
+table th, table td {
+  padding: 5px 10px;
+}
+
 .hide {
   display: none;
 }
 
+table,
 .tag, .nav a, .foot,
 .page-head .tags, .page-head .time, .page-head .lmod,
 .dev-item ul, .tags-list, .page-count,
