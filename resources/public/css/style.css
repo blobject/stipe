@@ -82,23 +82,98 @@ table {
 }
 
 table, table th, table td {
-  border: 1px solid #b0b0b0;
+  border: 1px solid #d0d0d0;
 }
 
 table th, table td {
   padding: 5px 10px;
 }
 
-.hide {
-  display: none;
-}
-
-table,
-.tag, .nav a, .foot,
+table, .small, .tag, .nav a, .foot,
 .page-head .tags, .page-head .time, .page-head .lmod,
 .dev-item ul, .tags-list, .page-count,
 .pages-list .page-time .time, .pages-list .page-time .lmod {
   font-size: small;
+}
+
+.hide {
+  display: none;
+}
+
+.sortable table th {
+  cursor: pointer;
+  padding-right: 5px;
+}
+
+.sortable table th:focus, .sortable table th:hover {
+  background-color: #f8f8f8;
+}
+
+.sortable table th:after {
+	content: '';
+	float: right;
+	margin-top: 5px;
+	border-width: 0 5px 5px;
+	border-style: solid;
+	border-color: #606060 transparent;
+	visibility: hidden;
+	opacity: 0;
+	-ms-user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	user-select: none;
+}
+
+.sortable table th[aria-sort=ascending]:after {
+  border-bottom: none;
+  border-width: 5px 5px 0;
+}
+
+.sortable table th[aria-sort]:after {
+  visibility: visible;
+  opacity: 0.4;
+}
+
+.sortable table th:focus:after, .sortable table th:hover:after {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tag {
+  display: inline-block;
+  color: #808080;
+  border: 1px solid #b0b0b0;
+  border-radius: 2px;
+  margin: 5px;
+  padding: 1px 2px;
+  line-height: 1.6em;
+}
+
+.tag:focus, .tag:hover {
+  color: #202020;
+  border-color: #202020;
+}
+
+.tag.active {
+  color: #ffffff;
+  background-color: #808080;
+  border-color: #808080;
+}
+
+.tag.clear {
+  margin-left: 0;
+  margin-right: 1px;
+}
+
+.tag.flat {
+  color: #b0b0b0;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tag.flat:focus, .tag.flat:hover {
+  color: #202020;
 }
 
 .nav, .page, .foot {
@@ -299,41 +374,4 @@ table,
 
 .foot a.froot {
   color: #000000;
-}
-
-.tag {
-  display: inline-block;
-  color: #808080;
-  border: 1px solid #b0b0b0;
-  border-radius: 2px;
-  margin: 5px;
-  padding: 1px 2px;
-  line-height: 1.6em;
-}
-
-.tag:focus, .tag:hover {
-  color: #202020;
-  border-color: #202020;
-}
-
-.tag.active {
-  color: #ffffff;
-  background-color: #808080;
-  border-color: #808080;
-}
-
-.tag.clear {
-  margin-left: 0;
-  margin-right: 1px;
-}
-
-.tag.flat {
-  color: #b0b0b0;
-  border: none;
-  margin: 0;
-  padding: 0;
-}
-
-.tag.flat:focus, .tag.flat:hover {
-  color: #202020;
 }
