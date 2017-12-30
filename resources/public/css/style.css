@@ -60,7 +60,7 @@ img {
 }
 
 p {
-  line-height: 1.5em;
+  line-height: 1.7em;
   word-wrap: break-word;
 }
 
@@ -145,7 +145,7 @@ table, .small, .tag, .nav a, .foot,
   border: 1px solid #b0b0b0;
   border-radius: 2px;
   margin: 5px;
-  padding: 1px 2px;
+  padding: 1px 4px;
   line-height: 1.6em;
 }
 
@@ -155,9 +155,9 @@ table, .small, .tag, .nav a, .foot,
 }
 
 .tag.active {
-  color: #ffffff;
-  background-color: #808080;
-  border-color: #808080;
+  color: #000000;
+  background-color: #e0e0e0;
+  border-color: #000000;
 }
 
 .tag.clear {
@@ -238,6 +238,10 @@ table, .small, .tag, .nav a, .foot,
   color: #f50057;
 }
 
+.page p {
+  text-align: justify;
+}
+
 .page-head {
   margin-bottom: 50px;
 }
@@ -272,7 +276,7 @@ table, .small, .tag, .nav a, .foot,
   margin: 50px 0 30px;
 }
 
-.welcome {
+.welcome p {
   color: #e0e0e0;
   line-height: 1.5em;
 }
@@ -354,24 +358,26 @@ table, .small, .tag, .nav a, .foot,
 }
 
 .foot {
-  margin-top: 50px;
   padding: 50px 20px;
   text-align: right;
-  opacity: .3;
 }
 
-.foot:focus, .foot:hover {
-  opacity: .6;
+.foot:focus a, .foot:hover a {
+  color: #3f51b5;
+}
+
+.foot:focus a.froot, .foot:hover a.froot {
+  color: #808080;
 }
 
 .foot a {
-  color: #0000ff;
+  color: #9fa8eb;
+}
+
+.foot a.froot {
+  color: #b0b0b0;
 }
 
 .foot a:focus, .foot a:hover {
   font-weight: bold;
-}
-
-.foot a.froot {
-  color: #000000;
 }
