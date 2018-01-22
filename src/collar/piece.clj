@@ -59,10 +59,7 @@
       [:div.page-head
        [:h1.title (or title short)]
        (if (seq tags)
-         [:div.tags (->> tags
-                         sort
-                         (map #(create-tag % "flat"))
-                         (interpose ", "))])
+         [:div.tags (->> tags sort (map #(create-tag % nil)))])
        (if (some? time) [:div.time time])
        (if (and (some? lmod) (not= time lmod)) [:div.lmod lmod])]
       [:div.page-body text]]
