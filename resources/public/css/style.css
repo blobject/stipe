@@ -96,6 +96,10 @@ table, .small, .tag, .nav a, .foot,
   font-size: small;
 }
 
+.faint {
+  color: #909090;
+}
+
 .hide {
   display: none;
 }
