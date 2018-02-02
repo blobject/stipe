@@ -5,9 +5,9 @@
 ### about
 
 - purpose:
+    - personal blogging platform
     - an exercise after http://clojure-doc.org/articles/tutorials/basic_web_development.html (@ july 2017)
-    - a space to play around, test ideas, compile, and exhibit
-- distribution:
+- deployed at:
     - [alocy.be](https://alocy.be)
 - license:
     - [mit](https://raw.githubusercontent.com/agarick/collar/master/LICENSE): source code
