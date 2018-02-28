@@ -1,6 +1,6 @@
 # collar
 
-![alocybe](https://alocy.be/img/alocybe-64.png "agaric")
+![agaric](https://agaric.net/img/agaric-64.png "agaric")
 
 ### about
 
@@ -8,12 +8,10 @@
     - personal blogging platform
     - an exercise after http://clojure-doc.org/articles/tutorials/basic_web_development.html (@ july 2017)
 - deployed at:
-    - [alocy.be](https://alocy.be)
+    - [agaric.net](https://agaric.net)
 - license:
     - [mit](https://raw.githubusercontent.com/agarick/collar/master/LICENSE): source code
-    - [cc by-nc-sa 4.0](https://alocy.be/about): superposed content
-- naming
-    - "where 'the other head' rests"
+    - [cc by-nc-sa 4.0](https://agaric.net/about): superposed content
 
 ### operation
 

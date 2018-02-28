@@ -32,8 +32,8 @@
     [:div.nav
      [:div.root
       [:a {:href "/" :class (here "root")}
-       [:img.cup {:src "/img/alocybe-24.png"}]
-       (if u/is-master? "alocybe" u/site-name)]]
+       [:img.cup {:src "/img/agaric-24.png"}]
+       (if u/is-master? "agaric" u/site-name)]]
      [:div.links
       [:a {:href "/about" :class (here "about")} "about"]
       [:a {:href "/dev" :class (here "dev")} "dev"]

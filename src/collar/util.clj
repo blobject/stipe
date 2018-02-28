@@ -12,9 +12,8 @@
 (def site-name
   (cond
     is-dev? (str "localhost:" (:port c/env))
-    is-next? "dev.alocy.be"
-    is-master? "alocy.be"))
-(def site-path (str "https://" site-name))
+    is-next? "dev.agaric.net"
+    is-master? "agaric.net"))
 (def db-path "db/")
 
 (defn timestamp [secs]

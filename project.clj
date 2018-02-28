@@ -1,6 +1,6 @@
 (defproject collar "0.1.0"
-  :description "alocy.be base"
-  :url "https://alocy.be"
+  :description "agaric.net base"
+  :url "https://agaric.net"
   :min-lein-version "2.0.0"
   :dependencies [[aleph "0.4.4"]
                  [clj-time "0.14.2"]
