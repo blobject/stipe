@@ -27,12 +27,6 @@ blockquote p {
   color: #606060
 }
 
-code {
-  font-size: 15px;
-  background-color: #e8e8e8;
-  padding: 2px 3px;
-}
-
 h1, h2, h3, h4, h5, h6, div {
   font-size: medium;
 }
@@ -230,6 +224,13 @@ table, .small, .tag, .nav a, .foot,
 
 .page a:focus, .page a:hover {
   color: #f50057;
+}
+
+.page code {
+  font-size: 15px;
+  background-color: #e8e8e8;
+  padding: 2px 3px;
+  white-space: nowrap;
 }
 
 .page p {
