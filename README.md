@@ -1,7 +1,5 @@
 # collar
 
-![agaric logo](https://agaric.net/img/agaric-64.png "agaric logo")
-
 ### about
 
 - purpose:
