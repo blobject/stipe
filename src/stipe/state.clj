@@ -1,5 +1,5 @@
-(ns collar.state
-  (:require [collar.util :as u]
+(ns stipe.state
+  (:require [stipe.util :as u]
             [clojure.java.io :as io]
             [clojure.string :as s]
             [markdown.core :as md]))

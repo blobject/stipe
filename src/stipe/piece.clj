@@ -1,5 +1,5 @@
-(ns collar.piece
-  (:require [collar.util :as u]
+(ns stipe.piece
+  (:require [stipe.util :as u]
             [clojure.string :as s]
             [hiccup.page :as h]
             [hiccup.util :as hu]))

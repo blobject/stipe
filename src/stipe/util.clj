@@ -1,4 +1,4 @@
-(ns collar.util
+(ns stipe.util
   (:require [clj-time.coerce :as tr]
             [clj-time.core :as tc]
             [clj-time.format :as tf]

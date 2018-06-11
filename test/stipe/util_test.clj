@@ -1,5 +1,5 @@
-(ns collar.util-test
-  (:require [collar.util :as u]
+(ns stipe.util-test
+  (:require [stipe.util :as u]
             [clojure.test :refer :all]))
 
 (deftest timestamp

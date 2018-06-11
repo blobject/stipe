@@ -1,6 +1,6 @@
 #!/bin/sh
 
-src=$HOME/src/collar
+src=$HOME/src/stipe
 dst=agaric:/srv/agaric.net
 
 copy() {

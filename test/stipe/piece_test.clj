@@ -1,6 +1,6 @@
-(ns collar.piece-test
-  (:require [collar.piece :as p]
-            [collar.util :as u]
+(ns stipe.piece-test
+  (:require [stipe.piece :as p]
+            [stipe.util :as u]
             [clojure.test :refer :all]))
 
 (deftest create-tag

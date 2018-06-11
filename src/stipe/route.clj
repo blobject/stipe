@@ -1,5 +1,5 @@
-(ns collar.route
-  (:require [collar.page :as p]
+(ns stipe.route
+  (:require [stipe.page :as p]
             [compojure.core :as c]
             [compojure.route :as r]))
 

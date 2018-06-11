@@ -1,5 +1,5 @@
-(ns collar.core
-  (:require [collar.route :as r]
+(ns stipe.core
+  (:require [stipe.route :as r]
             [aleph.http :as a]
             [aleph.netty :as an]
             [config.core :as c]

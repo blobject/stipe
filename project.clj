@@ -1,4 +1,4 @@
-(defproject collar "0.1.0"
+(defproject stipe "0.1.0"
   :description "agaric.net base"
   :url "https://agaric.net"
   :min-lein-version "2.0.0"
@@ -14,8 +14,8 @@
   :plugins [[lein-ancient "0.6.14"]
             [lein-figwheel "0.5.14"]
             [lein-ring "0.12.2"]]
-  :ring {:handler collar.core/app}
-  :main collar.core
+  :ring {:handler stipe.core/app}
+  :main stipe.core
   :profiles
   {:dev {:dependencies [[ring/ring-mock "0.3.2"]]
          :resource-paths ["config/development"]}

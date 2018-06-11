@@ -1,7 +1,7 @@
-(ns collar.page
-  (:require [collar.piece :as p]
-            [collar.state :as state]
-            [collar.util :as u]
+(ns stipe.page
+  (:require [stipe.piece :as p]
+            [stipe.state :as state]
+            [stipe.util :as u]
             [clojure.string :as s]))
 
 (defn get-page [raw-page]
