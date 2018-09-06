@@ -14,17 +14,17 @@
 (defn get-name [file]
   (-> file .getName (s/replace #"\.md$" "")))
 
-(defn upstate-f [file]
+(defn upstate-file [file]
   (let [name (get-name file)
         lmod (.lastModified file)
         old (get @state name)
         f (fn []
             (let [data (md/md-to-html-string-with-meta
                         (slurp file) :reference-links? true)]
-              {:lmod lmod :data data :name name}))]
+              {:lmod lmod :name name :data data}))]
     (if (= (:lmod old) lmod) old (f))))
 
 (defn upstate []
   (let [files (->> (io/file u/db-path) .listFiles (filter valid?) sort)
-        new (zipmap (map get-name files) (map upstate-f files))]
+        new (zipmap (map get-name files) (map upstate-file files))]
     (reset! state new)))
