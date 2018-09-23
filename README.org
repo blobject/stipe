@@ -15,6 +15,29 @@
 
 *** operation
 
-- Place all [[https://github.com/yogthos/markdown-clj][markdown]] files (eg. your individual blog posts) into a folder situated as =/db/=. The filenames should end in =.md= and the file contents can include [[https://github.com/fletcher/MultiMarkdown/wiki/MultiMarkdown-Syntax-Guide#metadata][metadata]], of which only =Title=, =Date=, and =Keywords= are used.
-- Create =/config/master/config.edn= with [[https://github.com/agarick/stipe/blob/master/src/stipe/util.clj#L7][:env]] and [[https://github.com/agarick/stipe/blob/master/src/stipe/core.clj#L17][:port]] entries.
-- Run =lein with-profile master run=
+- Place all markdown files (eg. your individual blog posts) into a folder situated as =/db/=. The filenames should end in =.md= and the file contents can include metadata, of which only =title=, =date=, =keywords=, and =js= * are used.
+  - * the =js= key does not appear in the [[https://github.com/fletcher/MultiMarkdown/wiki/MultiMarkdown-Syntax-Guide#metadata][MultiMarkdown]] specs, but [[https://github.com/yogthos/markdown-clj][yogthos/markdown-clj]] seems to recognise arbitrary keys nonetheless.
+
+example, /\slash{}db\slash{}n.md:/
+#+BEGIN_SRC markdown
+title: Neuromancer (William Gibson)
+date: 457488001
+keywords: Science Fiction, Cyberpunk
+js: wintermute.min.js
+
+# Part 1, Chiba City Blues
+
+## 1
+
+The sky above the port was the color of ...
+#+END_SRC
+
+- Create a profile config.
+
+example, /\slash{}config\slash{}master\slash{}config.edn:/
+#+BEGIN_SRC clojure
+{:env "master"
+ :port 8000}
+#+END_SRC
+
+- Execute =lein with-profile PROFILE run=. Following the above config example, "PROFILE" would be "master".

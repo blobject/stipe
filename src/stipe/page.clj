@@ -6,7 +6,7 @@
 
 (defn get-page [raw-page]
   (let [{:keys [data name lmod]} raw-page
-        {:keys [title date keywords]} (:metadata data)
+        {:keys [title date keywords js]} (:metadata data)
         short (s/replace name "-" " ")]
     {:name name
      :short short
@@ -16,6 +16,10 @@
              #{})
      :time (if (seq date) (-> date first Integer/parseInt (* 1000)))
      :lmod lmod
+     :js (if (seq js)
+           (map (fn [j] [:script {:src (str "/js/" j)}])
+                (s/split (first js) #"\s+"))
+           nil)
      :text (:html data)}))
 
 (defn get-pages []
@@ -28,13 +32,14 @@
        {:short "not found"}
        nil
        (p/not-found name))
-      (let [{:keys [short title time lmod tags text]} (get-page which)]
+      (let [{:keys [short title time lmod tags text js]} (get-page which)]
         (p/create-page
          {:short short
           :title title
           :time (if time (u/timestamp time))
           :lmod (u/timestamp lmod)
-          :tags tags}
+          :tags tags
+          :js js}
          (p/foot name)
          text)))))
 

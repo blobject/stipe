@@ -13,7 +13,7 @@
     name
     (str page-scope "/" name)))
 
-(defn head [title]
+(defn head [title js]
   [:head
    (if u/is-master?
      [:script "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create', 'UA-104505539-1', 'auto');ga('send', 'pageview');"])
@@ -25,7 +25,7 @@
    (h/include-css "/css/style.css")
    [:link {:rel "stylesheet"
            :href "https://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro"}]
-   [:script {:src "/js/tablesort.min.js"}]])
+   js])
 
 (defn nav [title]
   (let [here (fn [where] (if (= where title) "here"))]
@@ -52,9 +52,9 @@
    [:div.tag (if class {:class class}) tagname]])
 
 (defn create-page [pre post & text]
-  (let [{:keys [short title time lmod tags]} pre]
+  (let [{:keys [short title time lmod tags js]} pre]
     (h/html5
-     (head short)
+     (head short js)
      (nav short)
      [:div {:class (str "page _" (s/replace short " " "-"))}
       [:div.page-head
