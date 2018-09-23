@@ -1,6 +1,6 @@
 * stipe
 
-[[https://agaric.net/img/agaric-64.png]]
+[[https://b.agaric.net/img/agaric-64.png]]
 
 *** about
 
@@ -8,10 +8,10 @@
   - personal blogging platform
   - an exercise after http://clojure-doc.org/articles/tutorials/basic_web_development.html (@ july 2017)
 - deployed at:
-  - [[https://agaric.net]]
+  - [[https://b.agaric.net]]
 - license:
   - [[https://raw.githubusercontent.com/agarick/stipe/master/LICENSE][mit]] (source code)
-  - [[https://agaric.net/about][cc by-nc-sa 4.0]] (superposed content)
+  - [[https://b.agaric.net/about][cc by-nc-sa 4.0]] (superposed content)
 
 *** operation
 

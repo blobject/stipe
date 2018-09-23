@@ -13,7 +13,7 @@
   (cond
     is-dev? (str "localhost:" (:port c/env))
     is-next? "dev.agaric.net"
-    is-master? "agaric.net"))
+    is-master? "b.agaric.net"))
 (def db-path "db/")
 
 (defn timestamp [secs]

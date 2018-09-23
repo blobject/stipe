@@ -1,7 +1,7 @@
 #!/bin/sh
 
 src=$HOME/src/stipe
-dst=agaric:/srv/agaric.net
+dst=agaric:/home/b/www/stipe
 
 copy() {
   rsync -cv $src/$1/* $dst/$1/

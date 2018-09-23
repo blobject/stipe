@@ -33,7 +33,7 @@
      [:div.root
       [:a {:href "/" :class (here "root")}
        [:img.cup {:src "/img/agaric-24.png"}]
-       (if u/is-master? "agaric" u/site-name)]]
+       (if u/is-master? "b" u/site-name)]]
      [:div.links
       [:a {:href "/about" :class (here "about")} "about"]
       [:a {:href "/dev" :class (here "dev")} "dev"]

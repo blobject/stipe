@@ -12,6 +12,6 @@
    m/site-defaults))
 
 (defn -main [& [port]]
-  (println "starting agaric.net")
+  (println "starting b.agaric.net")
   (an/wait-for-close
    (a/start-server #'app {:port (:port c/env)})))

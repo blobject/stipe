@@ -1,6 +1,6 @@
 (defproject stipe "0.1.0"
-  :description "agaric.net base"
-  :url "https://agaric.net"
+  :description "b.agaric.net base"
+  :url "https://b.agaric.net"
   :min-lein-version "2.0.0"
   :dependencies [[aleph "0.4.6"]
                  [clj-time "0.14.4"]
