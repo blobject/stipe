@@ -24,7 +24,7 @@
            :href "/favicon.ico"}]
    (h/include-css "/css/style.css")
    [:link {:rel "stylesheet"
-           :href "https://fonts.googleapis.com/css?family=Source+Code+Pro|Source+Sans+Pro"}]
+           :href "https://fonts.googleapis.com/css?family=Source+Code+Pro"}]
    js])
 
 (defn nav [title]
