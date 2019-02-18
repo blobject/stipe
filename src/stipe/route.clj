@@ -10,7 +10,11 @@
          (p/flip "about"))
   (c/GET "/dev" []
          (p/flip "dev"))
+  (c/GET "/dev/" []
+         (p/flip "dev"))
   (c/GET "/pages" [tag]
+         (p/flip-pages tag))
+  (c/GET "/pages/" [tag]
          (p/flip-pages tag))
   (c/GET "/page/:p" [p]
          (p/flip (clojure.string/lower-case p)))
