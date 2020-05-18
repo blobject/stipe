@@ -5,7 +5,8 @@ body {
 }
 
 body, code {
-  font-family: 'Source Code Pro', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  font-family: 'Roboto Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  font-weight: 400;
 }
 
 a, p, li {
@@ -392,7 +393,7 @@ table, .small, .tag, .nav a, .foot,
 }
 
 .foot a:focus, .foot a:hover {
-  font-weight: bold;
+  font-weight: 700;
 }
 
 @media all and (max-width: 900px) {
