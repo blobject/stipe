@@ -32,7 +32,7 @@ js: wintermute.min.js
 The sky above the port was the color of ...
 #+END_SRC
 
-- Create a profile config.
+- Create a profile config, under "development", "next", or "master".
 
 example, /config\slash{}master\slash{}config.edn:/
 #+BEGIN_SRC clojure

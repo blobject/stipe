@@ -17,8 +17,8 @@
   :ring {:handler stipe.core/app}
   :main stipe.core
   :profiles
-  {:dev {:dependencies [[ring/ring-mock "0.3.2"]]
-         :resource-paths ["config/development"]}
+  {:development {:dependencies [[ring/ring-mock "0.3.2"]]
+                 :resource-paths ["config/development"]}
    :next {:resource-paths ["config/next"]}
    :master {:resource-paths ["config/master"]}
    :uberjar {:aot :all}}
