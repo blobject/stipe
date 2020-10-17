@@ -251,7 +251,7 @@ table, .small, .tag, .nav a, .foot,
   display: inline-block;
   background-color: #f0f0f0;
   padding: .5em 1em;
-  line-height: 2em;
+  line-height: 1em;
   border-radius: 0;
 }
 
