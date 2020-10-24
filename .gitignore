@@ -1,12 +1,6 @@
-/.lein-*
-/.nrepl-port
-/checkouts
-/classes
 /config
 /db
-/lib
+/resources/public/img/
 /target
-pom.xml
-pom.xml.asc
 *.jar
 *.class
