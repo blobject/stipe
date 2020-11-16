@@ -10,7 +10,7 @@
 - deployed at:
   - [[https://b.agaric.net]]
 - license:
-  - [[https://raw.githubusercontent.com/agarick/stipe/master/LICENSE][mit]] (source code)
+  - [[https://raw.githubusercontent.com/blobject/stipe/master/LICENSE][mit]] (source code)
   - [[https://b.agaric.net/about][cc by-nc-sa 4.0]] (superposed content)
 
 *** use
