@@ -1,6 +1,5 @@
-/config
 /db
-/resources/public/img/
-/target
-*.jar
-*.class
+/pub/favicon.ico
+/pub/img/
+/pub/misc/
+/target/

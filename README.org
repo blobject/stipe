@@ -1,43 +1,50 @@
 * stipe
 
-[[https://b.agaric.net/img/agaric-64.png]]
+[[https://b.agaric.net/pub/img/agaric-64.png]]
 
 *** about
 
-- purpose:
-  - personal blogging platform
-  - an exercise after http://clojure-doc.org/articles/tutorials/basic_web_development.html (@ july 2017)
-- deployed at:
-  - [[https://b.agaric.net]]
-- license:
-  - [[https://raw.githubusercontent.com/blobject/stipe/master/LICENSE][mit]] (source code)
-  - [[https://b.agaric.net/about][cc by-nc-sa 4.0]] (superposed content)
+Custom blog engine written in rust, using
+[[https://actix.rs/][actix]],
+[[https://github.com/rust-ammonia/ammonia][ammonia]],
+[[https://github.com/djc/askama][askama]],
+[[https://crates.io/crates/chrono][chrono]],
+[[https://crates.io/crates/rand][rand]], and
+[[https://crates.io/crates/regex][regex]].
+
+The engine was originally written in clojure (see [[https://github.com/blobject/stipe/tree/clojure]["clojure" branch]]) but that had to be abandoned due to memory limitations in deployment.
 
 *** use
 
-- Place all markdown files (eg. your individual blog posts) into a folder situated as =db/=. The filenames should end in =.md= and the file contents can include metadata, of which only =title=, =date=, =keywords=, and =js= * are used.
-  - * the =js= key does not appear in the [[https://github.com/fletcher/MultiMarkdown/wiki/MultiMarkdown-Syntax-Guide#metadata][MultiMarkdown]] specs, but [[https://github.com/yogthos/markdown-clj][yogthos/markdown-clj]] seems to recognise arbitrary keys nonetheless.
+- Place all markdown files (eg. your individual blog posts) into a folder situated at =db/=. The filenames should end in =.md= and the file contents can include metadata in the format:
 
-example, /db\slash{}n.md:/
-#+BEGIN_SRC markdown
-title: Neuromancer (William Gibson)
-date: 457488001
-keywords: Science Fiction, Cyberpunk
-js: wintermute.min.js
+    #+BEGIN_SRC
+    key0: value0
+    key1: value10, value11, ...
+    :::
+    Lorem ipsum ...
+    #+END_SRC
 
-# Part 1, Chiba City Blues
+  - the =time= key takes the page creation time, in seconds-since-unix-epoch
+  - the =tag= key takes a comma-separated list of strings, representing the thematic tags associated with the blog post
+  - the =script= key takes a comma-separated list of filenames relative to ~pub/js/~
+  - for details on the markdown specification, see [[https://github.com/raphlinus/pulldown-cmark][pulldown-cmark]] and [[https://spec.commonmark.org/][commonmark]]
 
-## 1
+- example, /db\slash{}neuromancer.md:/
 
-The sky above the port was the color of ...
-#+END_SRC
+    #+BEGIN_SRC markdown
+    title: Neuromancer (William Gibson)
+    time: 457488001
+    tag: Science Fiction, Cyberpunk
+    script: wintermute.min.js
+    :::
+    # Part 1, Chiba City Blues
+    
+    ## 1
+    
+    The sky above the port was the color of ...
+    #+END_SRC
 
-- Create a profile config, under "development", "next", or "master".
+- Execute the server with ~cargo run --release~.
 
-example, /config\slash{}master\slash{}config.edn:/
-#+BEGIN_SRC clojure
-{:env "master"
- :port 8000}
-#+END_SRC
-
-- Execute =lein with-profile PROFILE run=. Following the above config example, "PROFILE" would be "master".
+- Visit at =http://localhost:8000=
