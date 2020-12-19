@@ -89,11 +89,15 @@ table th, table td {
   padding: 5px 10px;
 }
 
-table, .small, .tag, .nav a, .foot,
-.page-head .tags, .page-head .time, .page-head .lmod,
-.dev-item ul, .tags-list, .page-count,
-.pages-list .page-time .time, .pages-list .page-time .lmod {
+table, .small, .tag, .nav a, .foot, .foot .lace,
+.page-head .time, .page-head .lmod,
+.dev-item ul, .tags, .page-count,
+.pages .page-time .time, .pages .page-time .lmod {
   font-size: 13px;
+}
+
+.tag-count {
+  font-size: 11px;
 }
 
 .faint {
@@ -145,29 +149,32 @@ table, .small, .tag, .nav a, .foot,
 
 .tag {
   display: inline-block;
-  background-color: #f0f0f0;
-  color: #808080;
-  border: 1px solid #e8e8e8;
   border-radius: 2px;
   margin: 5px;
-  padding: 1px 2px;
-  line-height: 1.4em;
+  padding: 0 4px;
+  line-height: 1.5em;
+}
+
+.tag, .tag:link, .tag:visited {
+  background-color: #f0f0f0;
+  color: #808080;
+  border: 1px solid #e4e4e4;
 }
 
 .tag:focus, .tag:hover {
-  color: #202020;
-  border-color: #202020;
+  color: #404040;
+  border-color: #404040;
+}
+
+.tag:active {
+  color: #404040;
+  border-color: #404040;
 }
 
 .tag.active {
-  color: #000000;
   background-color: #e0e0e0;
+  color: #000000;
   border-color: #000000;
-}
-
-.tag.clear {
-  margin-left: 0;
-  margin-right: 1px;
 }
 
 .nav, .page, .foot {
@@ -223,14 +230,6 @@ table, .small, .tag, .nav a, .foot,
   padding: 20px;
 }
 
-.page a {
-  color: #3f51b5;
-}
-
-.page a:focus, .page a:hover {
-  color: #f50057;
-}
-
 .page code {
   font-size: 15px;
   background-color: #e0e0e0;
@@ -272,13 +271,26 @@ table, .small, .tag, .nav a, .foot,
   margin-top: 10px;
 }
 
+.page-head .time, .page-head .lmod {
+  font-weight: 700;
+  line-height: 1.5em;
+}
+
 .page-head .time {
-  color: #808080;
+  color: #b0b0b0;
   margin-top: 25px;
 }
 
-.page-head .tags, .page-head .lmod {
-  color: #b0b0b0;
+.page-head .lmod {
+  color: #808080;
+}
+
+.page-body a {
+  color: #3f51b5;
+}
+
+.page-body a:focus, .page-body a:hover {
+  color: #f50057;
 }
 
 .page-body div.i {
@@ -307,6 +319,57 @@ table, .small, .tag, .nav a, .foot,
   margin: 50px 0 30px;
 }
 
+.page-body .tags {
+  margin-bottom: 40px;
+}
+
+.page-body .tags .tag {
+  margin: 5px;
+  padding: 0;
+}
+
+.page-body .tag {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.page-body .tag-name {
+  flex-grow: 1;
+  padding: 0 4px;
+}
+
+.page-body .tag.clear {
+  font-weight: 700;
+  color: #a0a0a0;
+}
+
+.page-body .tag-count {
+  flex-grow: 1;
+  font-weight: 700;
+  background-color: #f8f8f8;
+  color: #b0b0b0;
+  padding: 0 4px;
+  border-left: 1px solid #e8e8e8;
+  border-radius: 0 2px 2px 0;
+}
+
+.page-body .tag:focus .tag-count,
+.page-body .tag:hover .tag-count,
+.page-body .tag:active .tag-count,
+.page-body .tag.active .tag-count {
+  color: #606060;
+}
+
+.page-body .tag.active .tag-count {
+  background-color: #f0f0f0;
+  border-left-color: #d8d8d8;
+}
+
+.page-body .page-count {
+  margin-top: 10px;
+}
+
 .welcome p {
   color: #e0e0e0;
   line-height: 1.5em;
@@ -320,77 +383,106 @@ table, .small, .tag, .nav a, .foot,
   margin: 5px 0;
 }
 
-.tags-list, .pages-list {
+.tags, .pages {
   list-style: none;
   padding: 0;
 }
 
-.tags-list {
-  color: #b0b0b0;
+.tags {
+  color: #a0a0a0;
   margin: 0 10px;
 }
 
-.tags-list li {
+.tags li {
   display: inline;
 }
 
-.page-count {
-  margin: 10px 8px 40px;
+.tags .tag, .tags .tag:link, .tags .tag:visited {
+  background-color: #f0f0f0;
+  color: #808080;
+  border: 1px solid #e4e4e4;
 }
 
-.pages-list li {
-  margin: 15px -15px;
-  padding: 15px;
+.tags .tag:focus, .tags .tag:hover {
+  color: #404040;
+  border-color: #404040;
 }
 
-.pages-list li:focus, .pages-list li:hover {
-  background-color: #f8f8f8;
+.tags .tag:active {
+  color: #404040;
+  border-color: #404040;
 }
 
-.pages-list .page-link {
-  padding: 10px;
+.tags .tag.active {
+  background-color: #e0e0e0;
+  color: #000000;
+  border-color: #000000;
+}
+
+.pages li {
+  margin: 5px -10px;
+  padding: 20px;
   line-height: 2em;
 }
 
-.pages-list .page-time {
+.pages li:focus, .pages li:hover {
+  background-color: #f8f8f8;
+}
+
+.pages .page-time {
   float: left;
-  margin-right: 1.5em;
+  margin: 0 15px 0 0;
 }
 
-.pages-list .page-time .time, .pages-list .page-time .lmod {
-  font-weight: 400;
-}
-
-.pages-list .page-time .time {
-  margin-top: -.5em;
-}
-
-.pages-list .page-time .lmod {
-  opacity: .5;
-  margin-top: -1em;
-}
-
-.pages-list .name {
-  display: inline-block;
+.pages .page-time .time, .pages .page-time .lmod, .pages .name {
   font-weight: 700;
+  line-height: 1.5em;
 }
 
-.pages-list ul.tags {
+.pages .page-time .time {
+  color: #b0b0b0;
+  margin-top: -.25em;
+}
+
+.pages .page-time .lmod {
+  color: #808080;
+}
+
+.pages .name {
+  padding: 15px 20px;
+}
+
+.pages .page-tags {
   display: inline-block;
   list-style: none;
-  margin: 0 0 0 .5em;
+  margin: 0 0 0 5px;
   padding: 0;
 }
 
-.pages-list ul.tags li {
+.pages .page-tags li {
   display: inline;
   margin: 0;
   padding: 0;
 }
 
+.pages .page-tags .tag.active {
+  background-color: #ffffff;
+  color: #b0b0b0;
+  border-color: #d8d8d8;
+}
+
+.pages .page-tags .tag:focus, .pages .page-tags .tag:hover {
+  color: #404040;
+  border-color: #404040;
+}
+
 .foot {
-  padding: 50px 20px;
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  text-align: center;
+  margin: 20px auto;
+  padding: 30px 20px;
 }
 
 .foot:focus a, .foot:hover a {
@@ -413,7 +505,15 @@ table, .small, .tag, .nav a, .foot,
   font-weight: 700;
 }
 
-@media all and (min-width:480px) and (max-width: 900px) {
+.foot a span.slip, .foot a span.slip {
+  font-weight: 400;
+}
+
+.foot span.stride {
+  flex-grow: 1;
+}
+
+@media all and (min-width:480px) and (max-width: 800px) {
   blockquote {
     padding: 0 15px;
   }
@@ -430,11 +530,16 @@ table, .small, .tag, .nav a, .foot,
     margin: 8px 0;
   }
 
-  table, .small, .tag, .nav a, .foot,
-  .page-head .tags, .page-head .time, .page-head .lmod,
-  .dev-item ul, .tags-list, .page-count,
-  .pages-list .page-time .time, .pages-list .page-time .lmod {
+  table, .small, .tag, .nav a, .foot, .foot .lace,
+  .page-head .time, .page-head .lmod,
+  .dev-item ul, .tags, .page-count,
+  .pages .page-time .time, .pages .page-time .lmod {
     font-size: 12px;
+  }
+
+  .tag {
+    margin: 4px;
+    padding: 0 3px;
   }
 
   .nav {
@@ -486,16 +591,47 @@ table, .small, .tag, .nav a, .foot,
     margin: 35px 0 20px;
   }
 
+  .page-body .tags {
+    margin-bottom: 25px;
+  }
+
+  .page-body .tags .tag {
+    margin: 4px;
+  }
+
   .dev-item h1 {
     margin-bottom: 15px;
   }
 
+  .tags .tag-name,
+  .tags .tag-count {
+    padding: 0 3px;
+  }
+
   .page-count {
-    margin: 8px 8px 25px;
+    margin: 8px 0 25px;
+  }
+
+  .pages li {
+    margin: 5px -10px;
+    padding: 20px;
+  }
+
+  .pages .page-time {
+    margin: 0 10px 0 0;
+  }
+
+  .pages .name {
+    padding: 10px 15px;
+  }
+
+  .pages .page-tags {
+    margin: 0;
   }
 
   .foot {
-    padding: 30px 20px;
+    margin: 0 0 20px;
+    padding: 20px;
   }
 }
 
@@ -516,15 +652,20 @@ table, .small, .tag, .nav a, .foot,
     margin: 5px 0;
   }
 
-  table, .small, .tag, .nav a, .foot,
+  table, .small, .tag, .nav a, .foot, .foot .lace,
   .page-head .tags, .page-head .time, .page-head .lmod,
-  .dev-item ul, .tags-list, .page-count,
-  .pages-list .page-time .time, .pages-list .page-time .lmod {
+  .dev-item ul, .tags, .page-count,
+  .pages .page-time .time, .pages .page-time .lmod {
     font-size: 10px;
+  }
+
+  .tag-count {
+    font-size: 9px;
   }
 
   .tag {
     margin: 2px;
+    padding: 0 2px;
   }
 
   .nav {
@@ -576,20 +717,51 @@ table, .small, .tag, .nav a, .foot,
     margin: 25px 0 10px;
   }
 
+  .page-body .tags {
+    margin-bottom: 10px;
+  }
+
+  .page-body .tags .tag {
+    margin: 2px;
+  }
+
   .dev-item h1 {
     margin-bottom: 10px;
   }
 
-  .tags-list {
-    margin: 0 5px;
+  .tags {
+    margin: 0;
+  }
+
+  .tags .tag-name,
+  .tags .tag-count {
+    padding: 0 2px;
   }
 
   .page-count {
-    margin: 5px 8px 15px;
+    margin: 5px 0 15px;
+  }
+
+  .pages li {
+    margin: 0 -15px;
+    padding: 15px;
+  }
+
+  .pages .page-time {
+    margin: 0 10px 0 0;
+  }
+
+  .pages .name {
+    padding: 8px 10px;
+  }
+
+  .pages .page-tags {
+    margin: 0;
   }
 
   .foot {
-    padding: 10px 10px 20px;
+    margin: 0;
+    padding: 10px 10px 25px;
   }
 }
 
