@@ -27,7 +27,7 @@ The engine's original implementation in clojure ([[https://github.com/blobject/s
     Lorem ipsum ...
     #+END_SRC
 
-  - End the metadata declaration with a line containing exactly =:::= -- a page with no metadata should have =:::= as the first line.
+  - *Important!* End the metadata declaration with a line containing exactly =:::= -- a page with no metadata should have =:::= as the first line.
   - The =time= key takes the page creation time, in seconds-since-unix-epoch.
   - The =tag= key takes a comma-separated list of strings, representing the tags associated with the blog post.
   - The =script= key takes a comma-separated list of filenames (relative to ~pub/js/~), which get appended to the ~<head>~ block as ~<script>~ lines.
@@ -42,6 +42,7 @@ The engine's original implementation in clojure ([[https://github.com/blobject/s
     script: wintermute.min.js
     
     :::
+    
     <h1>Part 1, Chiba City Blues</h1>
     
     ## 1

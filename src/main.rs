@@ -1,4 +1,4 @@
-use actix_web::{web, HttpRequest, HttpResponse, Responder, Result};
+use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use actix_files::NamedFile;
 use ammonia::clean;
 use regex::Regex;
@@ -6,59 +6,32 @@ use std::collections::{BTreeSet, BTreeMap};
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
+use std::result::Result;
 use std::sync::Mutex;
 
 
-/*** structures ***************************************************************/
-
-struct State {
-  site: &'static str,
-  dir: &'static str,
-  scope: &'static str,
-  pub_dir: &'static str,
-  pub_scope: &'static str,
-  pages: Mutex<BTreeMap<String,Page>>,
-}
-
-
-struct Page {
-  link: String,
-  //title: String,
-  time: i64,
-  lmod: i64,
-  tags: Vec<String>,
-  //scripts: Vec<String>,
-  html: String,
-}
-
-
-/*** serving ******************************************************************/
-
 #[actix_web::main]
-async fn main() -> io::Result<()> {
+async fn main() ->
+  io::Result<()>
+{
   use actix_web::{guard, App, HttpServer};
 
-  let site = "b.agaric.net";
-  let dir = "db/";
-  let scope = "/page";
-  let pub_dir = "pub";
-  let pub_scope = "/pub";
-  let mut init = BTreeMap::new();
-  up_state(/* site  */ site,
-           /* host  */ "b.agaric.net",
-           /* dir   */ dir,
-           /* scope */ scope,
-           /* link  */ "",
-           /* name  */ "", // up_db() as well
-           /* pages */ &mut init);
   let state = web::Data::new(State {
-    site: site,
-    dir: dir,
-    scope: scope,
-    pub_dir: pub_dir,
-    pub_scope: pub_scope,
-    pages: Mutex::new(init),
+    site: "b.agaric.net",
+    dir: "db/",
+    scope: "/page",
+    pub_dir: "pub",
+    pub_scope: "/pub",
+    pages: Mutex::new(BTreeMap::new()),
   });
+  for dir in [state.dir, state.pub_dir].iter() {
+    if !Path::new(dir).is_dir() {
+      return Err(io::Error::new(io::ErrorKind::NotFound,
+                                [dir, " not a directory"].join("")));
+    }
+  }
+  state.up_state("b.agaric.net", "", "")
+    .unwrap_or_else(|e| println!("Err: main/{}", e));
 
   HttpServer::new(move || {
     App::new()
@@ -77,229 +50,295 @@ async fn main() -> io::Result<()> {
 }
 
 
-/*** routing for fixed pages **************************************************/
+/*** error ********************************************************************/
 
-async fn route_fav(_: HttpRequest) -> Result<NamedFile> {
+struct Error(String);
 
+impl std::fmt::Display for Error
+{
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result
+  {
+    f.write_str(&self.to_string())
+  }
+}
+
+
+/*** routing ******************************************************************/
+
+async fn route_fav(_: HttpRequest) ->
+  actix_web::Result<NamedFile>
+{
   Ok(NamedFile::open("pub/favicon.ico")?)
 }
 
 
-async fn route_root(
-  state: web::Data<State>,
+async fn route_root<'state>(
+  state: web::Data<State<'state>>,
   req: HttpRequest,
-) -> impl Responder {
-
+) -> impl Responder
+{
   HttpResponse::Ok().body(
-    html(/* error   */ false,
+    html(/* error   */ "",
          /* site    */ state.site,
          /* host    */ req.connection_info().host(),
          /* link    */ "/",
          /* query   */ "",
          /* scripts */ &vec![],
-         /* html    */ &pagelet_html(/* class */ "welcome",
+         /* html    */ &html_pagelet(/* class */ "welcome",
                                      /* title */ "welcome",
                                      /* text  */ &root_motd(),
                                      /* more  */ "")))
 }
 
 
-async fn route_pages(
-  state: web::Data<State>,
+async fn route_pages<'state>(
+  state: web::Data<State<'state>>,
   req: HttpRequest,
-) -> impl Responder {
-
-  let mut pages = state.pages.lock().unwrap();
+) -> impl Responder
+{
   let site = state.site;
   let conn = req.connection_info();
   let host = conn.host();
-  up_state(/* site  */ site,
-           /* host  */ host,
-           /* dir   */ state.dir,
-           /* scope */ state.scope,
-           /* link  */ "",
-           /* name  */ "", // up_db() as well
-           /* pages */ &mut pages);
+  state.up_state(host, "", "")
+    .unwrap_or_else(|e| println!("Err: route_pages/{}", e));
+  let mut pages = match state.pages.lock() {
+    Ok(o) => o,
+    Err(_) => {
+      println!("Err: route_pages: pages lock");
+      return respond_error(500, site, host, "pages", "", "pages");
+    },
+  };
 
   let pages_total = pages.len();
   let (query, tags_list, pages_list) =
     &pages_lists(req.query_string(), &mut pages);
   if 0 == pages_list.len() && 0 < pages_total {
-    return HttpResponse::NotFound().body(
-      html(/* error   */ true,
-           /* site    */ site,
-           /* host    */ host,
-           /* link    */ "pages",
-           /* query   */ query,
-           /* scripts */ &vec![],
-           /* html    */ &pagelet_html(/* class */ "error",
-                                       /* title */ "oops",
-                                       /* text  */ "no pages tagged",
-                                       /* more  */ query)));
+    return respond_error(404, site, host, "pages", "no pages tagged", query);
   }
 
   HttpResponse::Ok().body(
-    html(/* error   */ false,
+    html(/* error   */ "",
          /* site    */ site,
          /* host    */ host,
          /* link    */ "pages",
          /* query   */ query,
          /* scripts */ &vec![],
-         /* html    */ &pages_html(/* query */ query,
+         /* html    */ &html_pages(/* query */ query,
                                    /* total */ pages_total,
                                    /* tags  */ tags_list,
                                    /* pages */ pages_list)))
 }
 
 
-/*** routing for dynamic (markdown-parsed) pages ******************************/
-
-async fn flip(
-  state: web::Data<State>,
+async fn flip<'state>(
+  state: web::Data<State<'state>>,
   req: HttpRequest,
-) -> impl Responder {
-
-  let mut pages = state.pages.lock().unwrap();
+) -> impl Responder
+{
   let conn = req.connection_info();
   let host = conn.host();
-
+  let site = state.site;
   let dir = state.dir;
   let scope = state.scope;
-  let (bad, msg, name, text) = &flip_lick(req.match_info().path(), dir,
+  let (bad, msg, name, link) = &flip_lick(req.match_info().path(), dir,
                                           &[scope, "/"].join(""));
   if *bad {
-    return HttpResponse::NotFound().body(
-      html(/* error   */ true,
-           /* site    */ state.site,
-           /* host    */ host,
-           /* link    */ text,
-           /* query   */ "",
-           /* scripts */ &vec![],
-           /* html    */ &pagelet_html(/* class */ "error",
-                                       /* title */ "oops",
-                                       /* text  */ *msg,
-                                       /* more  */ text)));
+    return respond_error(404, site, host, link, *msg, link);
   }
 
-  // ensure state of requested page is up to date
-  //       site        host  dir  scope        link  name          pages
-  up_state(state.site, host, dir, state.scope, &text, name, &mut pages);
+  state.up_state(host, &link, name)
+    .unwrap_or_else(|e| println!("Err: flip/{}", e));
+  let pages = match state.pages.lock() {
+    Ok(o) => o,
+    Err(_) => {
+      println!("Err: flip: pages lock");
+      return respond_error(500, site, host, name, "", name);
+    },
+  };
 
-  HttpResponse::Ok().body(&pages.get(name).unwrap().html)
+  let page = match pages.get(name) {
+    Some(o) => o,
+    None => {
+      println!("Err: flip: get page");
+      return respond_error(500, site, host, name, "", name);
+    },
+  };
+
+  HttpResponse::Ok().body(&page.html)
 }
 
 
 /*** state ********************************************************************/
 
-fn up_state(
-  site: &str,
-  host: &str,
-  dir: &str,
-  scope: &str,
-  link: &str,
-  name: &str,
-  pages: &mut BTreeMap<String,Page>,
-) {
-  // empty name means refresh state of all pages
-  if name.is_empty() {
-    for (page_link, page_name, path) in &up_db(dir, pages) {
-      pages.insert(page_name.to_string(),
-                   up_page(site, host, scope, &page_link, &page_name,
-                           path.to_path_buf()));
+struct Page
+{
+  name: String,
+  link: String,
+  //title: String,
+  time: i64,
+  lmod: i64,
+  tags: Vec<String>,
+  //scripts: Vec<String>,
+  html: String,
+}
+
+
+struct State<'state>
+{
+  site: &'state str,
+  dir: &'state str,
+  scope: &'state str,
+  pub_dir: &'state str,
+  pub_scope: &'state str,
+  pages: Mutex<BTreeMap<String,Page>>,
+}
+
+impl<'state> State<'state>
+{
+  pub fn up_state(&self, host: &str, link: &str, name: &str) ->
+    Result<(),Error>
+  {
+    let mut pages = self.pages.lock()
+      .or_else(|_| Err(Error("up_state: pages lock".to_string())))?;
+
+    // empty name means refresh state of all pages
+    if name.is_empty() {
+      for (page_link, page_name, path) in &self.up_db(&mut pages)? {
+        let page = self.up_page(host, &page_name, &page_link,
+                                path.to_path_buf())?;
+        pages.insert(page_name.to_string(), page);
+      }
+      return Ok(());
     }
 
-  // refresh state of requested page only if necessary
-  } else if page_old(dir, &name, pages) {
-    let path = Path::new(&page_path(dir, &name)).to_path_buf();
-    pages.insert(name.to_string(),
-                 up_page(site, host, scope, link, name, path));
+    // refresh state of requested page only if necessary
+    let page = pages.get(name)
+      .ok_or_else(|| Error("up_state: get page".to_string()))?;
+    if self.page_old(&page)? {
+      let path = Path::new(&page_path(self.dir, &name)).to_path_buf();
+      let page = self.up_page(host, name, link, path)?;
+      pages.insert(name.to_string(), page);
+    }
+    return Ok(());
+  }
+
+
+  pub fn up_db(
+    &self,
+    pages: &mut BTreeMap<String,Page>
+  ) -> Result<Vec<(String,String,PathBuf)>,Error>
+  {
+    // remove nonexistent pages
+    // TODO: use BTreeMap.drain_filter() rather than reparse everything
+    for (name, _) in pages.iter() {
+      if !page_exists(self.dir, &name) {
+        pages.clear();
+        break;
+      }
+    }
+
+    // detect files to parse anew
+    let mut db = vec![];
+    let files = fs::read_dir(self.dir)
+      .or_else(|_| Err(Error("up_db: read_dir".to_string())))?;
+    for f in files {
+      // good file extension
+      let file = f.or_else(|_| Err(Error("up_db: file".to_string())))?;
+      let path = file.path();
+      let mut name = path.to_str().unwrap().to_string();
+      if !name.ends_with(".md") {
+        continue;
+      }
+
+      // sane charset
+      let caps = match Regex::new(&["^", self.dir, r"([^.]+)\.md$"].join(""))
+        .unwrap().captures(&name)
+      {
+        Some(o) => o,
+        None => { continue; },
+      };
+      name = match caps.get(1) {
+        Some(o) => o.as_str().to_string(),
+        None => { continue; },
+      };
+      let link = if name.eq("about") || name.eq("dev") {
+        name.clone()
+      } else {
+        ["page/", &name].join("")
+      };
+
+      // page in state older than in db
+      if pages.contains_key(name.as_str()) {
+        let meta = file.metadata()
+          .or_else(|_| Err(Error("up_db: file metadata".to_string())))?;
+        let page = pages.get(&name)
+          .ok_or_else(|| Error("up_db: get page".to_string()))?;
+        if page_lmod(meta) <= page.lmod {
+          continue;
+        }
+      }
+
+      db.push((link, name, path));
+    }
+
+    Ok(db)
+  }
+
+
+  pub fn up_page(
+    &self,
+    host: &str,
+    name: &str,
+    link: &str,
+    path: PathBuf,
+  ) -> Result<Page,Error>
+  {
+    let (title, time, lmod, tags, scripts, md) = parse(name, path)?;
+    let html_page = html_page(/* scope */ self.scope,
+                              /* name  */ name,
+                              /* title */ &title,
+                              /* time  */ time,
+                              /* lmod  */ lmod,
+                              /* tags  */ &tags,
+                              /* belly */ &md);
+
+    Ok(Page {
+      name: name.to_string(),
+      link: link.to_string(),
+      time: time,
+      lmod: lmod,
+      tags: tags,
+      html: html(/* error   */ "",
+                 /* site    */ self.site,
+                 /* host    */ host,
+                 /* link    */ &link,
+                 /* query   */ "",
+                 /* scripts */ &scripts,
+                 /* html    */ &html_page),
+    })
+  }
+
+
+  pub fn page_old(&self, page: &Page) ->
+    Result<bool,Error>
+  {
+    let path = page_path(self.dir, &page.name);
+    if !page_exists(self.dir, &page.name) {
+      return Ok(false);
+    }
+
+    let meta = fs::metadata(path)
+      .or_else(|_| Err(Error("page_old: file metadata".to_string())))?;
+    Ok(page_lmod(meta) > page.lmod)
   }
 }
 
 
-fn up_db(
-  dir: &str,
-  pages: &mut BTreeMap<String,Page>,
-) -> Vec<(String,String,PathBuf)> {
+/*** page helpers *************************************************************/
 
-  // remove nonexistent pages
-  // TODO: use BTreeMap.drain_filter() rather than reparse everything
-  for (name, _) in pages.iter() {
-    if !page_exists(&page_path(dir, &name)) {
-      pages.clear();
-      break;
-    }
-  }
-
-  // detect files to parse anew
-  if !Path::new(dir).is_dir() {
-    return vec![];
-  }
-
-  let mut db = vec![];
-  for f in fs::read_dir(dir).unwrap() {
-    let file = f.unwrap();
-    let path = file.path();
-    let mut name = path.to_str().unwrap().to_string();
-    if !name.ends_with(".md") {
-      continue;
-    }
-    name = Regex::new(&["^", dir, r"([^.]+)\.md$"].join(""))
-      .unwrap().captures(&name).unwrap().get(1).unwrap().as_str().to_string();
-    let link = if name.eq("about") || name.eq("dev") {
-      name.clone()
-    } else {
-      ["page/", &name].join("")
-    };
-    if pages.contains_key(name.as_str()) &&
-      page_lmod(file.metadata().unwrap()) <= pages.get(&name).unwrap().lmod
-    {
-      continue;
-    }
-    db.push((link, name, path));
-  }
-
-  db
-}
-
-
-fn up_page(
-  site: &str,
-  host: &str,
-  scope: &str,
-  link: &str,
-  name: &str,
-  path: PathBuf,
-) -> Page {
-
-  let (title, time, lmod, tags, scripts, md) = parse(name, path);
-  let page_html = page_html(/* scope */ scope,
-                            /* name  */ name,
-                            /* title */ &title,
-                            /* time  */ time,
-                            /* lmod  */ lmod,
-                            /* tags  */ &tags,
-                            /* belly */ &md);
-
-  Page {
-    link: link.to_string(),
-    time: time,
-    lmod: lmod,
-    tags: tags,
-    html: html(/* error   */ false,
-               /* site    */ site,
-               /* host    */ host,
-               /* link    */ &link,
-               /* query   */ "",
-               /* scripts */ &scripts,
-               /* html    */ &page_html),
-  }
-}
-
-
-/*** fixed-page helpers *******************************************************/
-
-fn root_motd() -> String {
+fn root_motd() ->
+  String
+{
   use rand::prelude::*;
 
   let mut rng = rand::thread_rng();
@@ -320,12 +359,15 @@ fn root_motd() -> String {
 fn pages_lists<'a>(
   input_query: &str,
   pages: &'a mut BTreeMap<String,Page>,
-) -> (String, BTreeMap<&'a str,i16>, Vec<(&'a String,&'a Page)>) {
-
+) -> (String,BTreeMap<&'a str,i16>,Vec<(&'a String,&'a Page)>)
+{
   let query = match Regex::new(r"[?&]?tag=([0-9A-za-z]+)").unwrap()
     .captures(input_query)
   {
-    Some(x) => clean(x.get(1).unwrap().as_str()).to_string(),
+    Some(x) => match x.get(1) {
+      Some(x) => clean(x.as_str()),
+      None => String::new(),
+    },
     None => String::new(),
   };
 
@@ -358,44 +400,48 @@ fn pages_lists<'a>(
 
 
 fn flip_lick<'a>(
-  path: &str,
+  req: &str,
   dir: &str,
   scope: &str,
-) -> (bool, &'a str, String, String) {
-
-  let mut name = clean(&path[1..]);
-  let mut text = String::new();
+) -> (bool,&'a str,String,String)
+{
+  let mut name = clean(&req[1..]);
   let max = 128;
   let mut bad = false;
   let mut msg = "";
   let msg_bad = "bad page request";
   let msg_miss = "page not found";
 
-  // error: path too long
-  if max < path.len() {
+  // error: req too long
+  let mut link = if max >= req.len() {
+    name.clone()
+  } else {
     bad = true;
     name.truncate(max - 1);
     msg = msg_bad;
-    text = (&[&name, "\u{2026}"].join("")).to_string();
+    (&[&name, "\u{2026}"].join("")).to_string()
+  };
+
+  // trim "/page" prefix and set it to be the name
+  if Some(0) == req.find(scope) {
+    name = req.replacen(scope, "", 1);
   }
-  // non-error: trim "/page" prefix
-  if Some(0) == path.find(scope) {
-    name = path.replacen(scope, "", 1);
-  }
-  // error: path not sane
+
+  // error: req not sane
   if !Regex::new(r"^[0-9A-Za-z_-]+$").unwrap().is_match(&name) {
     bad = true;
     msg = msg_bad;
-    text = name.clone();
-  }
-  // error: path looks ok but does not point to a valid file
-  if !bad && !page_exists(&page_path(dir, &name)) {
-    bad = true;
-    msg = msg_miss;
-    text = name.clone();
+    link = name.clone();
   }
 
-  (bad, msg, name, text)
+  // error: req looks ok but does not point to a valid file
+  if !bad && !page_exists(dir, &name) {
+    bad = true;
+    msg = msg_miss;
+    link = name.clone();
+  }
+
+  (bad, msg, name, link)
 }
 
 
@@ -404,19 +450,23 @@ fn flip_lick<'a>(
 fn parse(
   name: &str,
   path: PathBuf,
-) -> (String, i64, i64, Vec<String>, Vec<String>, String) {
+) -> Result<(String,i64,i64,Vec<String>,Vec<String>,String),Error>
+{
   use std::io::BufRead;
 
   let mut title = Regex::new(r"[_-]+").unwrap()
     .replace(name, regex::NoExpand(" ")).to_string();
   let mut time = 0;
-  let lmod = page_lmod(fs::metadata(&path).unwrap());
+  let meta = fs::metadata(&path)
+    .or_else(|_| Err(Error("parse: file metadata".to_string())))?;
   let sep = Regex::new(r",\s*").unwrap();
   let mut tags = vec![];
   let mut scripts = vec![];
   let mut md = String::new();
   let mut done_meta = false;
-  for l in io::BufReader::new(fs::File::open(path.as_path()).unwrap()).lines() {
+  let file = fs::File::open(path.as_path())
+    .or_else(|_| Err(Error("parse: file open".to_string())))?;
+  for l in io::BufReader::new(file).lines() {
     let line = l.unwrap();
     if line.eq(":::") {
       done_meta = true;
@@ -428,106 +478,134 @@ fn parse(
       }
       match Regex::new(r"^\s*([^\s:]+):\s+(.*)$").unwrap().captures(&line) {
         Some(x) => {
-          let cap = x.get(2).unwrap().as_str();
-          match x.get(1).unwrap().as_str() {
-            "title" => title = cap.to_string(),
-            "time" => time = cap.parse::<i64>().unwrap(),
-            "tag" => tags = sep.split(cap).collect::<Vec<_>>().iter()
-              .map(|s| (*s).to_string()).collect(),
-            "script" => scripts = sep.split(cap).collect::<Vec<_>>().iter()
-              .map(|s| (*s).to_string()).collect(),
-            _ => ()
+          let cap = match x.get(2) {
+            Some(x) => x.as_str(),
+            None => { continue; },
+          };
+          match x.get(1) {
+            Some(x) => match x.as_str() {
+              "title" => title = cap.to_string(),
+              "time" => time = cap.parse::<i64>().unwrap(),
+              "tag" => tags = sep.split(cap).collect::<Vec<_>>().iter()
+                .map(|s| (*s).to_string()).collect(),
+              "script" => scripts = sep.split(cap).collect::<Vec<_>>().iter()
+                .map(|s| (*s).to_string()).collect(),
+              _ => { continue; },
+            },
+            None => { continue; },
           }
-        }
-        None => ()
+        },
+        None => (),
       }
       continue;
-    } else {
-      md.push_str(&line);
-      md.push_str("\n");
     }
+    md.push_str(&line);
+    md.push_str("\n");
   }
 
-  (title, time, lmod, tags, scripts, md_to_html(&md))
+  Ok((title, time, page_lmod(meta), tags, scripts, md_to_html(&md)))
 }
 
 
-fn md_to_html(md: &str) -> String {
+fn md_to_html(md: &str) ->
+  String
+{
   use pulldown_cmark::{html, Options, Parser};
 
   let parser = Parser::new_ext(md, Options::all());
-  let mut md_html = String::new();
-  html::push_html(&mut md_html, parser);
+  let mut html_md = String::new();
+  html::push_html(&mut html_md, parser);
 
-  md_html
+  html_md
 }
 
 
-fn page_old(
-  dir: &str,
-  name: &str,
-  pages: &BTreeMap<String,Page>,
-) -> bool {
-
-  let path = page_path(dir, name);
-  if !page_exists(&path) {
-    return false;
-  }
-
-  let page = pages.get(name).unwrap();
-
-  page_lmod(fs::metadata(path).unwrap()) > page.lmod
-}
-
-
-fn page_path(dir: &str, name: &str) -> String {
-
+fn page_path(dir: &str, name: &str) ->
+  String
+{
   [dir, name, ".md"].join("")
 }
 
 
-fn page_lmod(meta: fs::Metadata) -> i64 {
+fn page_exists(dir: &str, name: &str) ->
+  bool
+{
+  Path::new(&page_path(dir, name)).is_file()
+}
 
+fn page_lmod(meta: fs::Metadata) ->
+  i64
+{
   meta.modified().unwrap()
     .duration_since(std::time::SystemTime::UNIX_EPOCH).unwrap()
     .as_secs() as i64
 }
 
 
-fn page_exists(path: &str) -> bool {
-
-  Path::new(path).exists()
-}
-
-
-fn timestamp(secs: i64) -> String {
-
+fn timestamp(secs: i64) ->
+  String
+{
   let then = chrono::NaiveDateTime::from_timestamp(secs, 0);
 
   then.format("%Y-%m-%d").to_string()
 }
 
 
+fn respond_error(
+  code: i32,
+  site: &str,
+  host: &str,
+  link: &str,
+  mut text: &str,
+  more: &str,
+) -> HttpResponse
+{
+  let (error, mut response) = match code {
+    500 => {
+      text = "trouble processing";
+      ("500", HttpResponse::InternalServerError())
+    },
+    _ => {
+      ("404", HttpResponse::NotFound())
+    },
+  };
+
+  response.body(
+    html(/* error   */ error,
+         /* site    */ site,
+         /* host    */ host,
+         /* link    */ link,
+         /* query   */ "",
+         /* scripts */ &vec![],
+         /* html    */ &html_pagelet(/* class */ error,
+                                     /* title */ "oops",
+                                     /* text  */ text,
+                                     /* more  */ more)))
+}
+
+
 /*** html generation **********************************************************/
 
 fn html(
-  error: bool,           // 404 error
+  error: &str,           // error code
   site: &str,            // admin-defined site name
-  dirty_host: &str,      // detected site name
+  dirty_host: &str,      // user-requested site name
   dirty_link: &str,      // user-requested path
   dirty_query: &str,     // user-requested query
   scripts: &Vec<String>, // optional page scripts
   belly: &str,           // the html going into body > .page > .page-body
-) -> String {
-
+) -> String
+{
+  let host = clean(dirty_host);
   let link = clean(dirty_link);
+  let query = clean(dirty_query);
 
   [r#"<!doctype html>
 <html lang="en">
 <head>
 "#,
 
-   &analytics_html(site, &clean(dirty_host)),
+   &html_analytics(site, &host),
 
    r#"  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -537,36 +615,36 @@ fn html(
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap">
 "#,
 
-   &scripts_html(scripts),
+   &html_scripts(scripts),
 
    r#"</head>
 <body>
 "#,
 
-   &nav_html(&link),
+   &html_nav(&link),
 
    &belly,
 
-   &foot_html(error, &clean(dirty_query), &link),
+   &html_foot(error, &query, &link),
    r#"</body>
 "#].join("")
 }
 
 
-fn pages_html(
+fn html_pages(
   query: &str,
   total: usize,
   tags: &BTreeMap<&str,i16>,
   pages: &Vec<(&String,&Page)>,
-) -> String {
-
+) -> String
+{
   if pages.is_empty() {
-    return pagelet_html("", "pages", "no pages to list", "");
+    return html_pagelet("", "pages", "no pages to list", "");
   }
 
-  let head_tags = tags.iter().map(
+  let tags_list = tags.iter().map(
     |(tag, tag_count)|
-    [r#"<li><a class="tag"#,
+    [r#"        <li><a class="tag"#,
      if tag.eq(&query) { " active" } else { "" },
      r#"" href="/pages?tag="#,
      tag,
@@ -575,19 +653,15 @@ fn pages_html(
      r#"</span><span class="tag-count">"#,
      &tag_count.to_string(),
      r#"</span></a></li>
-        "#].join("")).collect::<String>();
+"#].join("")).collect::<String>();
+
   let clear = &[r#"        <li><a class="tag clear"#,
                 if query.is_empty() { " active" } else { "" },
-                r#"" href="/pages"><span class="tag-name">all</span><span class="tag-count">
-"#,
+                r#"" href="/pages"><span class="tag-name">all</span><span class="tag-count">"#,
                 &total.to_string(),
-                "</span></a></li>\n        "].join("");
-  let tags_html = [r#"      <ul class="tags">
-"#,
-                   clear,
-                   &head_tags,
-                   "      </ul>\n"].join("");
-  let pages_html = pages.iter().map(
+                "</span></a></li>\n"].join("");
+
+  let pages_list = pages.iter().map(
     |(name, page)| {
       let page_tags = if 0 == page.tags.len() {
         String::new()
@@ -626,11 +700,19 @@ fn pages_html(
       <h1 class="title">pages</h1>
     </div>
     <div class="page-body">
+      <ul class="tags">
 "#,
-   &tags_html,
-   r#"      <ul class="pages">
+
+   clear,
+
+   &tags_list,
+
+   r#"      </ul>
+      <ul class="pages">
 "#,
-   &pages_html,
+
+   &pages_list,
+
    r#"      </ul>
     </div>
   </div>
@@ -638,7 +720,7 @@ fn pages_html(
 }
 
 
-fn page_html(
+fn html_page(
   scope: &str,
   name: &str,
   title: &str,
@@ -646,8 +728,8 @@ fn page_html(
   lmod: i64,
   tags: &Vec<String>,
   md: &str,
-) -> String {
-
+) -> String
+{
   let page_tags = if 0 == tags.len() {
     String::new()
   } else {
@@ -701,8 +783,9 @@ fn page_html(
 }
 
 
-fn pagelet_html(class: &str, title: &str, text: &str, more: &str) -> String {
-
+fn html_pagelet(class: &str, title: &str, text: &str, more: &str) ->
+  String
+{
   let more_text = &[": <b>", more, "</b>"].join("");
   let class_text = &[" ", class].join("");
 
@@ -732,8 +815,9 @@ fn pagelet_html(class: &str, title: &str, text: &str, more: &str) -> String {
 }
 
 
-fn analytics_html(site: &str, host: &str) -> String {
-
+fn html_analytics(site: &str, host: &str) ->
+  String
+{
   if host.eq(site) {
     r#"  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PT10SS3WP3"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-PT10SS3WP3');</script>
 "#.to_string()
@@ -743,8 +827,9 @@ fn analytics_html(site: &str, host: &str) -> String {
 }
 
 
-fn scripts_html(scripts: &Vec<String>) -> String {
-
+fn html_scripts(scripts: &Vec<String>) ->
+  String
+{
   scripts.iter().map(
     |s| [r#"  <script src="/pub/js/"#,
          s,
@@ -753,8 +838,9 @@ fn scripts_html(scripts: &Vec<String>) -> String {
 }
 
 
-fn nav_html(link: &str) -> String {
-
+fn html_nav(link: &str) ->
+  String
+{
   [r#"  <div class="nav">
     <div class="root">
       <a "#,
@@ -784,8 +870,9 @@ fn nav_html(link: &str) -> String {
 }
 
 
-fn foot_html(error: bool, query: &str, link: &str) -> String {
-
+fn html_foot(error: &str, query: &str, link: &str) ->
+  String
+{
   if link.eq("/") {
     return String::new();
   }
@@ -800,16 +887,29 @@ fn foot_html(error: bool, query: &str, link: &str) -> String {
   } else {
     ["/", link, r#"<span class="slip">?tag=</span>"#, query].join("")
   };
+  let err = if error.is_empty() {
+    String::new()
+  } else {
+    [r#"    <span class="error">"#,
+     error,
+     r#"</span>
+"#].join("")
+  };
 
   [r#"  <div class="foot">
 "#,
-   if error { r#"    <span class="error">404</span>
-"# } else { "" },
+
+   &err,
+
    r#"    <span class="stride"></span>
     <div class="lace"><a class="froot" href="/">root</a></span><a href=""#,
+
    &dst,
+
    r#"">"#,
+
    &dsts,
+
    r#"</a></div>
   </div>
 "#].join("")
