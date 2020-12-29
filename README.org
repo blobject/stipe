@@ -19,22 +19,19 @@ The engine's original implementation in clojure ([[https://github.com/blobject/s
 *** use
 
 - Start by placing all markdown files (eg. your individual blog posts) into a folder situated at =db/=. The filenames should end in =.md=, and each file can include metadata at the very top, with the format:
-
     #+BEGIN_SRC markdown
     key0: value0
     key1: value10, value11, ...
     :::
     Lorem ipsum ...
     #+END_SRC
-
   - *Important!* End the metadata declaration with a line containing exactly =:::= -- a page with no metadata should have =:::= as the first line.
   - The =time= key takes the page creation time, in seconds-since-unix-epoch.
   - The =tag= key takes a comma-separated list of strings, representing the tags associated with the blog post.
-  - The =script= key takes a comma-separated list of filenames (relative to ~pub/js/~), which get appended to the ~<head>~ block as ~<script>~ lines.
-  - The metadata are parsed manually, but for the parsing of the rest of the file, the post itself, see [[https://github.com/raphlinus/pulldown-cmark][pulldown-cmark]] and [[https://spec.commonmark.org/][commonmark]].
+  - The =script= key takes a comma-separated list of filenames (relative to ~pub/js/~), which get appended as ~<script>~ lines to the ~<head>~ block.
+  - The metadata are parsed manually, but for the parsing of the rest of the file (ie. the post itself), see [[https://github.com/raphlinus/pulldown-cmark][pulldown-cmark]] and [[https://spec.commonmark.org/][commonmark]].
 
 - example, /db\slash{}neuromancer.md:/
-
     #+BEGIN_SRC markdown
     title: Neuromancer (William Gibson)
     time: 457488001
@@ -53,3 +50,4 @@ The engine's original implementation in clojure ([[https://github.com/blobject/s
 - Execute the server with ~cargo run~ or ~cargo run --release~.
 
 - Visit =http://localhost:8000=.
+
