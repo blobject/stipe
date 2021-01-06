@@ -2,9 +2,8 @@ use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use actix_files::NamedFile;
 use ammonia::clean;
 use regex::Regex;
-use std::collections::{BTreeSet, BTreeMap};
-use std::fs;
-use std::io;
+use std::collections::BTreeMap;
+use std::{fmt, fs, io};
 use std::path::{Path, PathBuf};
 use std::result::Result;
 use std::sync::Mutex;
@@ -57,6 +56,11 @@ async fn route_fav(_: HttpRequest) ->
 {
   Ok(NamedFile::open("pub/favicon.ico")?)
 }
+
+
+// TODO: - custom route for static files
+//       - proper fail from flip
+//       - handle /pub/../about
 
 
 async fn route_root(
@@ -127,8 +131,7 @@ async fn flip(
   let site = &state.site;
   let dir = &state.dir;
   let scope = &state.scope;
-  let (bad, msg, name, link) = &flip_lick(req.match_info().path(), dir,
-                                          &[scope, "/"].join(""));
+  let (bad, msg, name, link) = &flip_lick(req.match_info().path(), dir, scope);
   if *bad {
     return respond_error(404, site, host, link, *msg, link);
   }
@@ -159,9 +162,9 @@ async fn flip(
 
 struct Error(String);
 
-impl std::fmt::Display for Error
+impl fmt::Display for Error
 {
-  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result
   {
     f.write_str(&self.to_string())
   }
@@ -410,6 +413,8 @@ fn pages_lists<'a>(
   pages: &'a mut BTreeMap<String,Page>,
 ) -> (String,BTreeMap<&'a str,i16>,Vec<(&'a String,&'a Page)>)
 {
+  use std::collections::BTreeSet;
+
   let query = match Regex::new(r"[?&]?tag=([0-9A-za-z]+)").unwrap()
     .captures(input_query)
   {
@@ -454,43 +459,43 @@ fn flip_lick<'a>(
   scope: &str,
 ) -> (bool,&'a str,String,String)
 {
+  let full_scope = &[scope, "/"].join("");
   let mut name = clean(&req[1..]);
+  let mut link = name.clone();
   let max = 128;
-  let mut bad = false;
-  let mut msg = "";
   let msg_bad = "bad page request";
   let msg_miss = "page not found";
 
   // error: req too long
-  let mut link = if max >= req.len() {
-    name.clone()
-  } else {
-    bad = true;
+  if max < req.len() {
     name.truncate(max - 1);
-    msg = msg_bad;
-    (&[&name, "\u{2026}"].join("")).to_string()
-  };
+    link.truncate(max - 1);
+    name.push_str("\u{2026}");
+    link.push_str("\u{2026}");
+    return (true, msg_bad, name, link);
+  }
 
-  // trim "/page" prefix and set it to be the name
-  if Some(0) == req.find(scope) {
-    name = req.replacen(scope, "", 1);
+  // trim "/page/" prefix and set name to be the result
+  if Some(0) == req.find(full_scope) {
+    name = req.replace(full_scope, "");
+  }
+
+  // tolerate "dev/"
+  if name.eq("dev/") {
+    name.pop();
   }
 
   // error: req not sane
   if !Regex::new(r"^[0-9A-Za-z_-]+$").unwrap().is_match(&name) {
-    bad = true;
-    msg = msg_bad;
-    link = name.clone();
+    return (true, msg_bad, name, link);
   }
 
   // error: req looks ok but does not point to a valid file
-  if !bad && !page_exists(dir, &name) {
-    bad = true;
-    msg = msg_miss;
-    link = name.clone();
+  if !page_exists(dir, &name) {
+    return (true, msg_miss, name, link);
   }
 
-  (bad, msg, name, link)
+  (false, "", name, link)
 }
 
 
@@ -782,6 +787,7 @@ fn html_page(
 fn html_pagelet(class: &str, title: &str, text: &str, more: &str) ->
   String
 {
+  let long = 48;
   let mut html = String::with_capacity(256);
   html.push_str(r#"  <div class="page"#);
   if !class.is_empty() {
@@ -798,7 +804,11 @@ fn html_pagelet(class: &str, title: &str, text: &str, more: &str) ->
       <p>"#);
   html.push_str(text);
   if !more.is_empty() {
-    html.push_str(": <b>");
+    html.push_str(": ");
+    if long < more.len() {
+      html.push_str("<br/>");
+    }
+    html.push_str("<b>");
     html.push_str(more);
     html.push_str("</b>");
   }

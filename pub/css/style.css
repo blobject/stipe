@@ -524,6 +524,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
   ul {
     margin: 10px 0 25px;
+    padding-inline-start: 25px;
   }
 
   li {
@@ -646,6 +647,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
   ul {
     margin: 10px 0 20px;
+    padding-inline-start: 20px;
   }
 
   li {
