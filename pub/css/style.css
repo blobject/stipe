@@ -24,13 +24,13 @@ a:visited {
 }
 
 blockquote {
-  border-left: 4px solid #e0e0e0;
+  border-left: 4px solid #d2d6de;
   margin: 0;
   padding: 0 20px;
 }
 
 blockquote p {
-  color: #606060
+  color: #595e61;
 }
 
 h1, h2, h3, h4, h5, h6, div {
@@ -42,17 +42,24 @@ h1 {
 }
 
 h2 {
-  color: #606060;
+  color: #a32c2d;
 }
 
 h3, h4, h5, h6 {
-  color: #909090;
   margin: 35px 0 25px;
+}
+
+h3 {
+  color: #575a61;
+}
+
+h4, h5, h6 {
+  color: #92959d;
 }
 
 hr {
   border-top: none;
-  border-color: #e0e0e0;
+  border-color: #d2d6de;
 }
 
 img {
@@ -63,7 +70,7 @@ p {
   line-height: 1.7em;
 }
 
-ul {
+ol, ul {
   margin: 10px 0 30px;
 }
 
@@ -72,7 +79,7 @@ li {
   line-height: 1.5em;
 }
 
-li ul {
+li ol, li ul {
   margin: 10px 0 20px;
 }
 
@@ -82,7 +89,7 @@ table {
 }
 
 table, table th, table td {
-  border: 1px solid #d0d0d0;
+  border: 1px solid #d2d6de;
 }
 
 table th, table td {
@@ -91,7 +98,7 @@ table th, table td {
 
 table, .small, .tag, .nav a, .foot, .foot .lace,
 .page-head .time, .page-head .lmod,
-.dev-item ul, .tags, .page-count,
+.dev-item ol, .dev-item ul, .tags, .page-count,
 .pages .page-time .time, .pages .page-time .lmod {
   font-size: 13px;
 }
@@ -101,7 +108,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 }
 
 .faint {
-  color: #909090;
+  color: #92959d;
 }
 
 .hide {
@@ -123,7 +130,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
   margin-top: 5px;
   border-width: 0 5px 5px;
   border-style: solid;
-  border-color: #606060 transparent;
+  border-color: #575a61 transparent;
   visibility: hidden;
   opacity: 0;
   -ms-user-select: none;
@@ -232,7 +239,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
 .page code {
   font-size: 15px;
-  background-color: #e0e0e0;
+  background-color: #eceff7;
   padding: 2px 3px;
   border-radius: 2px;
 }
@@ -242,13 +249,13 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 }
 
 .page pre {
-  border-left: solid 3px #d0d0d0;
+  border-left: solid 3px #d2d6de;
   overflow-x: auto;
 }
 
 .page pre code {
   display: inline-block;
-  background-color: #f0f0f0;
+  background-color: #eceff7;
   padding: .5em 1em;
   line-height: 1em;
   border-radius: 0;
@@ -286,11 +293,11 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 }
 
 .page-body a {
-  color: #3f51b5;
+  color: #3c56aa;
 }
 
 .page-body a:focus, .page-body a:hover {
-  color: #f50057;
+  color: #667ad3;
 }
 
 .page-body div.i {
@@ -371,7 +378,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 }
 
 .-welcome p {
-  color: #e0e0e0;
+  color: #d2d6de;
   line-height: 1.5em;
 }
 
@@ -486,19 +493,19 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 }
 
 .foot:focus a, .foot:hover a {
-  color: #3f51b5;
+  color: #3c56aa;
 }
 
 .foot:focus a.froot, .foot:hover a.froot {
-  color: #808080;
+  color: #92959d;
 }
 
 .foot a {
-  color: #9fa8eb;
+  color: #667ad3;
 }
 
 .foot a.froot, .foot span.error {
-  color: #b0b0b0;
+  color: #b9bdc5;
 }
 
 .foot a:focus, .foot a:hover {
@@ -522,7 +529,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
     font-size: 14px;
   }
 
-  ul {
+  ol, ul {
     margin: 10px 0 25px;
     padding-inline-start: 25px;
   }
@@ -533,7 +540,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
   table, .small, .tag, .nav a, .foot, .foot .lace,
   .page-head .time, .page-head .lmod,
-  .dev-item ul, .tags, .page-count,
+  .dev-item ol, .dev-item ul, .tags, .page-count,
   .pages .page-time .time, .pages .page-time .lmod {
     font-size: 12px;
   }
@@ -645,7 +652,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
     font-size: 12px;
   }
 
-  ul {
+  ol, ul {
     margin: 10px 0 20px;
     padding-inline-start: 20px;
   }
@@ -656,7 +663,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
   table, .small, .tag, .nav a, .foot, .foot .lace,
   .page-head .tags, .page-head .time, .page-head .lmod,
-  .dev-item ul, .tags, .page-count,
+  .dev-item ol, .dev-item ul, .tags, .page-count,
   .pages .page-time .time, .pages .page-time .lmod {
     font-size: 10px;
   }

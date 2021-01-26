@@ -14,7 +14,7 @@ A basic file-based blog engine written in rust, with the help of
 
 Posts are in markdown format and are flat (one level deep).
 
-The engine's original implementation in clojure ([[https://github.com/blobject/stipe/tree/clojure][see branch]]) had to be abandoned due to memory limitations in deployment.
+The engine's original implementation [[https://github.com/blobject/stipe/tree/clojure][in clojure]] had to be abandoned due to memory limitations in deployment.
 
 *** use
 
@@ -49,5 +49,5 @@ The engine's original implementation in clojure ([[https://github.com/blobject/s
 
 - Execute the server with ~cargo run~ or ~cargo run --release~.
 
-- Visit =http://localhost:8000=.
+- Visit =http://localhost:8000/page/neuromancer=.
 
