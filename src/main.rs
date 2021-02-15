@@ -566,7 +566,13 @@ fn md_to_html(md: &str) ->
 {
   use pulldown_cmark::{html, Options, Parser};
 
-  let parser = Parser::new_ext(md, Options::all());
+  let mut opts = Options::empty();
+  opts.insert(Options::ENABLE_TABLES);
+  opts.insert(Options::ENABLE_FOOTNOTES);
+  opts.insert(Options::ENABLE_STRIKETHROUGH);
+  opts.insert(Options::ENABLE_TASKLISTS);
+  //opts.insert(Options::ENABLE_SMART_PUNCTUATION);
+  let parser = Parser::new_ext(md, opts);
   let mut html_md = String::new();
   html::push_html(&mut html_md, parser);
 
