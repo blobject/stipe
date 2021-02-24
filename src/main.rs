@@ -15,6 +15,7 @@ async fn main() ->
 {
   use actix_web::{guard, App, HttpServer};
 
+  let port = "8490";
   let pub_dir = "pub";
 
   let state = web::Data::new(State {
@@ -45,22 +46,17 @@ async fn main() ->
                        .route(web::route()
                               .guard(guard::Not(guard::Get()))
                               .to(HttpResponse::MethodNotAllowed)))
-  }).bind("localhost:8000")?.run().await
+  }).bind(["localhost:", port].join(""))?.run().await
 }
 
 
-/*** routing ******************************************************************/
+/*** routing *****************************************************************/
 
 async fn route_fav(_: HttpRequest) ->
   actix_web::Result<NamedFile>
 {
   Ok(NamedFile::open("pub/favicon.ico")?)
 }
-
-
-// TODO: - custom route for static files
-//       - proper fail from flip
-//       - handle /pub/../about
 
 
 async fn route_root(
@@ -158,7 +154,7 @@ async fn flip(
 }
 
 
-/*** error ********************************************************************/
+/*** error *******************************************************************/
 
 struct Error(String);
 
@@ -178,7 +174,7 @@ fn err(fun: &str, what: &str) ->
 }
 
 
-/*** state ********************************************************************/
+/*** state *******************************************************************/
 
 struct Page
 {
@@ -353,7 +349,7 @@ impl State
 }
 
 
-/*** page helpers *************************************************************/
+/*** page helpers ************************************************************/
 
 fn respond_error(
   code: i32,
@@ -459,7 +455,8 @@ fn flip_lick<'a>(
   scope: &str,
 ) -> (bool,&'a str,String,String)
 {
-  let full_scope = &[scope, "/"].join("");
+  let tolerable = vec!["about", "dev", "dev/"];
+  let scoped = &[&scope[1..], "/"].join("");
   let mut name = clean(&req[1..]);
   let mut link = name.clone();
   let max = 128;
@@ -467,7 +464,7 @@ fn flip_lick<'a>(
   let msg_miss = "page not found";
 
   // error: req too long
-  if max < req.len() {
+  if max < name.len() {
     name.truncate(max - 1);
     link.truncate(max - 1);
     name.push_str("\u{2026}");
@@ -475,14 +472,23 @@ fn flip_lick<'a>(
     return (true, msg_bad, name, link);
   }
 
-  // trim "/page/" prefix and set name to be the result
-  if Some(0) == req.find(full_scope) {
-    name = req.replace(full_scope, "");
+  // tolerate non-/page/ exceptions
+  if tolerable.iter().any(|p| p == &name) {
+    name = Regex::new(r"/$").unwrap().replace(&name, "").to_string();
   }
+  // typical /page/ request
+  else if Some(0) == name.find(scoped) {
+    name = name.replace(scoped, "");
 
-  // tolerate "dev/"
-  if name.eq("dev/") {
-    name.pop();
+    // error: a /page/ request appended by a tolerated non-/page/
+    //        (eg. /page/about)
+    if tolerable.iter().any(|p| p == &name) {
+      return (true, msg_bad, name, link);
+    }
+  }
+  // error: intolerable
+  else {
+    return (true, msg_bad, name, link);
   }
 
   // error: req not sane
@@ -499,7 +505,7 @@ fn flip_lick<'a>(
 }
 
 
-/*** utility ******************************************************************/
+/*** utility *****************************************************************/
 
 fn parse(
   name: &str,
@@ -522,7 +528,7 @@ fn parse(
     .or_else(|_| Err(err("parse", "file open")))?;
   for l in io::BufReader::new(file).lines() {
     let line = l.unwrap();
-    if line.eq(":::") {
+    if Regex::new(r"^[:\s]*:::+[:\s]*$").unwrap().is_match(&line) {
       done_meta = true;
       continue;
     }
@@ -612,7 +618,7 @@ fn timestamp(secs: i64) ->
 }
 
 
-/*** html generation **********************************************************/
+/*** html generation *********************************************************/
 
 fn html(
   error: &str,           // error code

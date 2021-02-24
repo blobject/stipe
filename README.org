@@ -25,7 +25,9 @@ The engine's original implementation [[https://github.com/blobject/stipe/tree/cl
     :::
     Lorem ipsum ...
     #+END_SRC
-  - *Important!* End the metadata declaration with a line containing exactly =:::= -- a page with no metadata should have =:::= as the first line.
+  - *Important!* End the metadata declaration with a dinkus,
+    - where a dinkus is a line consisting of only colons and spaces and at least one 3-colon sequence (for example, " : ::: ::::: ::: :").
+    - A page with no metadata should have a dinkus as the first line.
   - The =time= key takes the page creation time, in seconds-since-unix-epoch.
   - The =tag= key takes a comma-separated list of strings, representing the tags associated with the blog post.
   - The =script= key takes a comma-separated list of filenames (relative to ~pub/js/~), which get appended as ~<script>~ lines to the ~<head>~ block.
