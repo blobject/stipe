@@ -641,6 +641,26 @@ fn html(
   s.push_str(&html_analytics(site, &host));
   s.push_str(r#"  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+"#);
+  s.push_str("  <title>~b");
+  if !link.eq("/") {
+    let max = 32;
+    let mut l = link.clone();
+    if max < l.len() {
+      l.truncate(max - 1);
+      l.push_str("\u{2026}");
+    }
+    s.push_str("/");
+    s.push_str(&l);
+  }
+  if !query.is_empty() {
+    s.push_str(":");
+    s.push_str(&query);
+  };
+  if !error.is_empty() {
+    s.push_str("!");
+  }
+  s.push_str(r#"</title>
   <link icon="/pub/favicon.ico">
   <link rel="stylesheet" href="/pub/css/style.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -910,22 +930,15 @@ fn html_foot(error: &str, query: &str, link: &str) ->
   }
   html.push_str(r#"    <span class="stride"></span>
     <div class="lace"><a class="froot" href="/">root</a></span><a href=""#);
-  if query.is_empty() {
-    html.push_str("/");
-    html.push_str(link);
-  } else {
-    html.push_str("/");
-    html.push_str(link);
+  html.push_str("/");
+  html.push_str(link);
+  if !query.is_empty() {
     html.push_str("?tag=");
     html.push_str(query);
   };
-  html.push_str(r#"">"#);
-  if query.is_empty() {
-    html.push_str("/");
-    html.push_str(link);
-  } else {
-    html.push_str("/");
-    html.push_str(link);
+  html.push_str(r#"">/"#);
+  html.push_str(link);
+  if !query.is_empty() {
     html.push_str(r#"<span class="slip">?tag=</span>"#);
     html.push_str(query);
   };
