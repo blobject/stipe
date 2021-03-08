@@ -1,6 +1,7 @@
-/db
-/pub/favicon.ico
-/pub/img/
-/pub/js/
-/pub/misc/
+.hg/
+.hgignore
+/db/
+/pub/
+!/pub/css/
+!/pub/js/
 /target/
