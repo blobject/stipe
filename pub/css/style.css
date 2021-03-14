@@ -248,6 +248,10 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
   text-align: justify;
 }
 
+.page.e404 p, .page.e500 p {
+  text-align: left;
+}
+
 .page pre {
   border-left: solid 3px #d2d6de;
   overflow-x: auto;
@@ -510,10 +514,6 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
 .foot a:focus, .foot a:hover {
   font-weight: 700;
-}
-
-.foot a span.slip, .foot a span.slip {
-  font-weight: 400;
 }
 
 .foot span.stride {

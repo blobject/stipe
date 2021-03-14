@@ -1,5 +1,5 @@
-use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use actix_files::NamedFile;
+use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use ammonia::clean;
 use regex::Regex;
 use std::collections::BTreeMap;
@@ -9,68 +9,82 @@ use std::result::Result;
 use std::sync::Mutex;
 
 
+static SITE:  &'static str = "b.agaric.net";
+static PORT:  &'static str = "8490";
+static PUB:   &'static str = "pub";
+static SCOPE: &'static str = "page";
+static DB:    &'static str = "db";
+
+
 #[actix_web::main]
 async fn main() ->
   io::Result<()>
 {
-  use actix_web::{guard, App, HttpServer};
-
-  let port = "8490";
-  let pub_dir = "pub";
+  use actix_web::{App, HttpServer};
 
   let state = web::Data::new(State {
-    site: "b.agaric.net".to_string(),
-    dir: "db/".to_string(),
-    scope: "/page".to_string(),
+    site: SITE.to_string(),
+    dir: DB.to_string(),
+    scope: SCOPE.to_string(),
     pages: Mutex::new(BTreeMap::new()),
   });
-  for dir in [&state.dir, pub_dir].iter() {
+  for dir in [&state.dir, PUB].iter() {
     if !Path::new(dir).is_dir() {
       return Err(io::Error::new(io::ErrorKind::NotFound,
-                                [dir, " not a directory"].join("")));
+                                ["not a directory: ", dir].join("")));
     }
   }
-  state.up_state("b.agaric.net", "", "")
-    .unwrap_or_else(|e| println!("Err: main/{}", e));
+  state.up_state("", "").unwrap_or_else(|e| println!("Err: main/{}", e));
+  let pages_route = ["/", &state.scope, "s{_:/?}"].join("");
+  let page_route = ["/", &state.scope, "/{page}"].join("");
 
   HttpServer::new(move || {
     App::new()
       .app_data(state.clone())
-      .service(actix_files::Files::new(&["/", pub_dir].join(""),
-                                       &pub_dir).show_files_listing())
-      .route("/favicon.ico", web::get().to(route_fav))
-      .route("/", web::get().to(route_root))
-      .route(&[&state.scope, "s"].join(""), web::get().to(route_pages))
-      .route(&[&state.scope, "s/"].join(""), web::get().to(route_pages))
-      .default_service(web::resource("").route(web::get().to(flip))
-                       .route(web::route()
-                              .guard(guard::Not(guard::Get()))
-                              .to(HttpResponse::MethodNotAllowed)))
-  }).bind(["localhost:", port].join(""))?.run().await
+      .service(actix_files::Files::new(&["/", PUB].join(""),
+                                       &PUB).show_files_listing())
+      .route("/favicon.ico",      web::get().to(route_fav))
+      .route("/",                 web::get().to(route_root))
+      .route(&pages_route,        web::get().to(route_pages))
+      .route("/{page:about}",     web::get().to(flip))
+      .route("/{page:dev}{_:/?}", web::get().to(flip))
+      .route(&page_route,         web::get().to(flip))
+      .default_service(web::get().to(route_miss))
+  }).bind(["localhost:", PORT].join(""))?.run().await
 }
 
 
 /*** routing *****************************************************************/
 
-async fn route_fav(_: HttpRequest) ->
+async fn route_miss(
+  state: web::Data<State>,
+  req: HttpRequest,
+) -> impl Responder
+{
+  let name = &bound(req.match_info().path())[1..];
+  respond_error(404, &state.site, name, "page not found", name)
+}
+
+
+async fn route_fav(_req: HttpRequest) ->
   actix_web::Result<NamedFile>
 {
-  Ok(NamedFile::open("pub/favicon.ico")?)
+  Ok(NamedFile::open(&[PUB, "/favicon.ico"].join(""))?)
 }
 
 
 async fn route_root(
   state: web::Data<State>,
-  req: HttpRequest,
+  _req: HttpRequest,
 ) -> impl Responder
 {
   HttpResponse::Ok().body(
     html(/* error   */ "",
          /* site    */ &state.site,
-         /* host    */ req.connection_info().host(),
          /* link    */ "/",
          /* query   */ "",
          /* scripts */ &vec![],
+         /* title   */ "",
          /* html    */ &html_pagelet(/* class */ "-welcome",
                                      /* title */ "welcome",
                                      /* text  */ &root_motd(),
@@ -84,33 +98,31 @@ async fn route_pages(
 ) -> impl Responder
 {
   let site = &state.site;
-  let conn = req.connection_info();
-  let host = conn.host();
-  state.up_state(host, "", "")
+  state.up_state("", "")
     .unwrap_or_else(|e| println!("Err: route_pages/{}", e));
   let mut pages = match state.pages.lock() {
     Ok(o) => o,
     Err(_) => {
       println!("Err: route_pages: pages lock");
-      return respond_error(500, site, host, "pages", "", "pages");
+      return respond_error(500, site, "pages", "", "pages");
     },
   };
 
   let pages_total = pages.len();
-  let (query, tags_list, pages_list) =
-    &pages_lists(req.query_string(), &mut pages);
-  if 0 == pages_list.len() && 0 < pages_total {
-    return respond_error(404, site, host, "pages", "no pages tagged", query);
+  let (err, query, tags_list, pages_list) =
+    &pages_lists(&clean(&bound(req.query_string())), &mut pages);
+  if *err || (0 == pages_list.len() && 0 < pages_total) {
+    return respond_error(404, site, "pages", "no pages tagged", query);
   }
 
   HttpResponse::Ok().body(
     html(/* error   */ "",
          /* site    */ site,
-         /* host    */ host,
          /* link    */ "pages",
-         /* query   */ query,
+         /* query   */ &query,
          /* scripts */ &vec![],
-         /* html    */ &html_pages(/* query */ query,
+         /* title   */ "pages",
+         /* html    */ &html_pages(/* query */ &query,
                                    /* total */ pages_total,
                                    /* tags  */ tags_list,
                                    /* pages */ pages_list)))
@@ -122,23 +134,26 @@ async fn flip(
   req: HttpRequest,
 ) -> impl Responder
 {
-  let conn = req.connection_info();
-  let host = conn.host();
   let site = &state.site;
   let dir = &state.dir;
   let scope = &state.scope;
-  let (bad, msg, name, link) = &flip_lick(req.match_info().path(), dir, scope);
-  if *bad {
-    return respond_error(404, site, host, link, *msg, link);
+  let n: String = req.match_info().get(scope).unwrap().parse().unwrap();
+  let name = &bound(&n);
+
+  if !Regex::new(r"^[0-9A-Za-z_-]+$").unwrap().is_match(name) ||
+     !page_exists(dir, name)
+  {
+    return respond_error(404, site, name, "page not found", name);
   }
 
-  state.up_state(host, &link, name)
+  state.up_state(&[scope, "/", name].join(""), name)
     .unwrap_or_else(|e| println!("Err: flip/{}", e));
+
   let pages = match state.pages.lock() {
     Ok(o) => o,
     Err(_) => {
       println!("Err: flip: pages lock");
-      return respond_error(500, site, host, name, "", name);
+      return respond_error(500, site, name, "", name);
     },
   };
 
@@ -146,7 +161,7 @@ async fn flip(
     Some(o) => o,
     None => {
       println!("Err: flip: get page");
-      return respond_error(500, site, host, name, "", name);
+      return respond_error(500, site, name, "", name);
     },
   };
 
@@ -199,31 +214,31 @@ struct State
 
 impl State
 {
-  pub fn up_state(&self, host: &str, link: &str, name: &str) ->
+  pub fn up_state(&self, link: &str, name: &str) ->
     Result<(),Error>
   {
     if name.is_empty() {
-      self.up_pages(host)
+      self.up_pages()
     } else {
-      self.up_page(host, link, name)
+      self.up_page(link, name)
     }
   }
 
 
-  pub fn up_pages(&self, host: &str) ->
+  pub fn up_pages(&self) ->
     Result<(),Error>
   {
     let mut pages = self.pages.lock()
       .or_else(|_| Err(err("up_pages", "pages lock")))?;
     for (page_link, page_name, path) in &self.up_db(&mut pages)? {
-      let page = self.page(host, &page_name, &page_link, path.to_path_buf())?;
+      let page = self.page(&page_name, &page_link, path.to_path_buf())?;
       pages.insert(page_name.to_string(), page);
     }
     Ok(())
   }
 
 
-  pub fn up_page(&self, host: &str, link: &str, name: &str) ->
+  pub fn up_page(&self, link: &str, name: &str) ->
     Result<(),Error>
   {
     let mut pages = self.pages.lock()
@@ -232,7 +247,7 @@ impl State
       .ok_or_else(|| err("up_page", "get page"))?;
     if self.page_is_old(&page)? {
       let path = Path::new(&page_path(&self.dir, &name)).to_path_buf();
-      let page = self.page(host, name, link, path)?;
+      let page = self.page(name, link, path)?;
       pages.insert(name.to_string(), page);
     }
     Ok(())
@@ -267,7 +282,7 @@ impl State
       }
 
       // sane charset
-      name = match Regex::new(&["^", &self.dir, r"([^.]+)\.md$"].join(""))
+      name = match Regex::new(&["^", &self.dir, r"/([^.]+)\.md$"].join(""))
         .unwrap().captures(&name)
       {
         Some(x) => match x.get(1) {
@@ -302,7 +317,6 @@ impl State
 
   pub fn page(
     &self,
-    host: &str,
     name: &str,
     link: &str,
     path: PathBuf,
@@ -325,10 +339,10 @@ impl State
       tags: tags,
       html: html(/* error   */ "",
                  /* site    */ &self.site,
-                 /* host    */ host,
                  /* link    */ &link,
                  /* query   */ "",
                  /* scripts */ &scripts,
+                 /* title   */ &title,
                  /* html    */ &html_page),
     })
   }
@@ -354,7 +368,6 @@ impl State
 fn respond_error(
   code: i32,
   site: &str,
-  host: &str,
   link: &str,
   mut text: &str,
   more: &str,
@@ -373,10 +386,10 @@ fn respond_error(
   response.body(
     html(/* error   */ error,
          /* site    */ site,
-         /* host    */ host,
          /* link    */ link,
          /* query   */ "",
          /* scripts */ &vec![],
+         /* title   */ "",
          /* html    */ &html_pagelet(/* class */ error,
                                      /* title */ "oops",
                                      /* text  */ text,
@@ -407,15 +420,20 @@ fn root_motd() ->
 fn pages_lists<'a>(
   input_query: &str,
   pages: &'a mut BTreeMap<String,Page>,
-) -> (String,BTreeMap<&'a str,i16>,Vec<(&'a String,&'a Page)>)
+) -> (bool,String,BTreeMap<&'a str,i16>,Vec<(&'a String,&'a Page)>)
 {
   use std::collections::BTreeSet;
 
+  if !input_query.is_empty() &&
+     input_query.chars().last().unwrap() == '\u{2026}'
+  {
+    return (true, input_query.to_string(), BTreeMap::new(), vec![]);
+  }
   let query = match Regex::new(r"[?&]?tag=([0-9A-za-z]+)").unwrap()
     .captures(input_query)
   {
     Some(x) => match x.get(1) {
-      Some(x) => clean(x.as_str()),
+      Some(x) => x.as_str().to_string(),
       None => String::new(),
     },
     None => String::new(),
@@ -423,7 +441,7 @@ fn pages_lists<'a>(
 
   let mut tags_take: BTreeSet<&str> = BTreeSet::new();
   let pages_list = pages.iter().filter(
-    |(_, page)| {
+    |(_name, page)| {
       let mut take = true;
       if !query.is_empty() {
         take = page.tags.contains(&query);
@@ -437,7 +455,7 @@ fn pages_lists<'a>(
     }).collect::<Vec<(&String,&Page)>>();
 
   let mut tags_list: BTreeMap<&str,i16> = BTreeMap::new();
-  for (_, page) in pages.iter() {
+  for (_name, page) in pages.iter() {
     for tag in page.tags.iter() {
       if tags_take.contains(tag.as_str()) {
         *tags_list.entry(tag).or_insert(0) += 1;
@@ -445,63 +463,7 @@ fn pages_lists<'a>(
     }
   }
 
-  (query, tags_list, pages_list)
-}
-
-
-fn flip_lick<'a>(
-  req: &str,
-  dir: &str,
-  scope: &str,
-) -> (bool,&'a str,String,String)
-{
-  let tolerable = vec!["about", "dev", "dev/"];
-  let scoped = &[&scope[1..], "/"].join("");
-  let mut name = clean(&req[1..]);
-  let mut link = name.clone();
-  let max = 128;
-  let msg_bad = "bad page request";
-  let msg_miss = "page not found";
-
-  // error: req too long
-  if max < name.len() {
-    name.truncate(max - 1);
-    link.truncate(max - 1);
-    name.push_str("\u{2026}");
-    link.push_str("\u{2026}");
-    return (true, msg_bad, name, link);
-  }
-
-  // tolerate non-/page/ exceptions
-  if tolerable.iter().any(|p| p == &name) {
-    name = Regex::new(r"/$").unwrap().replace(&name, "").to_string();
-  }
-  // typical /page/ request
-  else if Some(0) == name.find(scoped) {
-    name = name.replace(scoped, "");
-
-    // error: a /page/ request appended by a tolerated non-/page/
-    //        (eg. /page/about)
-    if tolerable.iter().any(|p| p == &name) {
-      return (true, msg_bad, name, link);
-    }
-  }
-  // error: intolerable
-  else {
-    return (true, msg_bad, name, link);
-  }
-
-  // error: req not sane
-  if !Regex::new(r"^[0-9A-Za-z_-]+$").unwrap().is_match(&name) {
-    return (true, msg_bad, name, link);
-  }
-
-  // error: req looks ok but does not point to a valid file
-  if !page_exists(dir, &name) {
-    return (true, msg_miss, name, link);
-  }
-
-  (false, "", name, link)
+  (false, query, tags_list, pages_list)
 }
 
 
@@ -596,7 +558,7 @@ fn page_exists(dir: &str, name: &str) ->
 fn page_path(dir: &str, name: &str) ->
   String
 {
-  [dir, name, ".md"].join("")
+  [dir, "/", name, ".md"].join("")
 }
 
 
@@ -618,51 +580,78 @@ fn timestamp(secs: i64) ->
 }
 
 
+fn titlestamp(error: bool, site: &str, link: &str, title: &str, tag: &str) ->
+  String
+{
+  if error || link.eq("/") {
+    return site.to_string();
+  }
+
+  let mut s = String::new();
+  if title.is_empty() {
+    s.push_str(link);
+  } else {
+    s.push_str(title);
+  }
+  if !tag.is_empty() {
+    s.push_str(":");
+    s.push_str(tag);
+  }
+  s.push_str(" - ");
+  s.push_str(site);
+
+  s
+}
+
+
+fn bound<S: Into<String>>(s: S) ->
+  String
+{
+  let max = 64;
+  let mut b = s.into();
+  match b.char_indices().nth(max) {
+    Some((i, _)) => {
+      b = b[..i - 1].to_string();
+      b.push_str("\u{2026}");
+      b
+    },
+    None => b,
+  }
+}
+
+
 /*** html generation *********************************************************/
 
 fn html(
   error: &str,           // error code
   site: &str,            // admin-defined site name
-  dirty_host: &str,      // user-requested site name
-  dirty_link: &str,      // user-requested path
-  dirty_query: &str,     // user-requested query
+  link: &str,            // user-requested path
+  query: &str,           // user-requested query
   scripts: &Vec<String>, // optional page scripts
+  title: &str,           // page title
   belly: &str,           // the html going into body > .page > .page-body
 ) -> String
 {
-  let host = clean(dirty_host);
-  let link = clean(dirty_link);
-  let query = clean(dirty_query);
   let mut s = String::with_capacity(16384);
   s.push_str(r#"<!doctype html>
 <html lang="en">
 <head>
 "#);
-  s.push_str(&html_analytics(site, &host));
+  s.push_str(&html_analytics());
   s.push_str(r#"  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 "#);
-  s.push_str("  <title>~b");
-  if !link.eq("/") {
-    let max = 32;
-    let mut l = link.clone();
-    if max < l.len() {
-      l.truncate(max - 1);
-      l.push_str("\u{2026}");
-    }
-    s.push_str("/");
-    s.push_str(&l);
-  }
-  if !query.is_empty() {
-    s.push_str(":");
-    s.push_str(&query);
-  };
-  if !error.is_empty() {
-    s.push_str("!");
-  }
+  s.push_str("  <title>");
+  s.push_str(&titlestamp(!error.is_empty(), site, &link, title, &query));
   s.push_str(r#"</title>
-  <link icon="/pub/favicon.ico">
-  <link rel="stylesheet" href="/pub/css/style.css">
+"#);
+  s.push_str(&html_social(site, &link, title, &query));
+  s.push_str(r#"  <link icon="/"#);
+  s.push_str(PUB);
+  s.push_str(r#"/favicon.ico">
+  <link rel="stylesheet" href="/"#);
+  s.push_str(PUB);
+  s.push_str(r#"/css/style.css">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap">
 "#);
@@ -788,7 +777,7 @@ fn html_page(
     html.push_str(r#"      <ul class="tags">
 "#);
     for tag in tags {
-      html.push_str(r#"        <li><a class="tag" href=""#);
+      html.push_str(r#"        <li><a class="tag" href="/"#);
       html.push_str(scope);
       html.push_str("s?tag=");
       html.push_str(tag);
@@ -808,7 +797,7 @@ fn html_page(
     <div class="page-body">
 "#);
   html.push_str(md);
-  html.push_str(r#"    </div
+  html.push_str(r#"    </div>
   </div>
 "#);
 
@@ -824,6 +813,9 @@ fn html_pagelet(class: &str, title: &str, text: &str, more: &str) ->
   html.push_str(r#"  <div class="page"#);
   if !class.is_empty() {
     html.push_str(" ");
+    if class.chars().next().unwrap().is_numeric() {
+      html.push_str("e");
+    }
     html.push_str(class);
   }
   html.push_str(r#"">
@@ -853,15 +845,78 @@ fn html_pagelet(class: &str, title: &str, text: &str, more: &str) ->
 }
 
 
-fn html_analytics(site: &str, host: &str) ->
+fn html_analytics() ->
   String
 {
-  if host.eq(site) {
-    r#"  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PT10SS3WP3"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-PT10SS3WP3');</script>
+  //String::new()
+  r#"  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PT10SS3WP3"></script><script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-PT10SS3WP3');</script>
 "#.to_string()
+}
+
+
+fn html_social(site: &str, link: &str, title: &str, tag: &str) ->
+  String
+{
+  let mut html = String::new();
+  let image = &["https://", site, "/", PUB, "/img/agaric-512.png"].join("");
+  let riddle = "What room has no walls?";
+  let full = &[site, "/", link].join("");
+  let full_tag = &[full, ":", tag].join("");
+  let stamp = &titlestamp(false, site, link, title, tag);
+  let short = if title.is_empty() {
+    site
   } else {
-    String::new()
-  }
+    stamp
+  };
+  let req = if title.is_empty() {
+    riddle
+  } else if tag.is_empty() {
+    full
+  } else {
+    full_tag
+  };
+  html.push_str(r#"  <meta name="description" content=""#);
+  html.push_str(req);
+  html.push_str(r#"">
+  <meta name="image" content=""#);
+  html.push_str(image);
+  html.push_str(r#"">
+  <meta itemprop="name" content=""#);
+  html.push_str(short);
+  html.push_str(r#"">
+  <meta itemprop="description" content=""#);
+  html.push_str(req);
+  html.push_str(r#"">
+  <meta itemprop="image" content=""#);
+  html.push_str(image);
+  html.push_str(r#"">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content=""#);
+  html.push_str(short);
+  html.push_str(r#"">
+  <meta name="twitter:description" content=""#);
+  html.push_str(req);
+  html.push_str(r#"">
+  <meta name="og:title" content=""#);
+  html.push_str(short);
+  html.push_str(r#"">
+  <meta name="og:description" content=""#);
+  html.push_str(req);
+  html.push_str(r#"">
+  <meta name="og:image" content=""#);
+  html.push_str(image);
+  html.push_str(r#"">
+  <meta name="og:url" content=""#);
+  html.push_str(&["https://", req].join(""));
+  html.push_str(r#"">
+  <meta name="og:site_name" content=""#);
+  html.push_str(short);
+  html.push_str(r#"">
+  <meta name="og:locale" content="en_US">
+  <meta name="og:type" content="website">
+"#);
+
+  html
 }
 
 
@@ -870,7 +925,9 @@ fn html_scripts(scripts: &Vec<String>) ->
 {
   let mut html = String::new();
   for s in scripts {
-    html.push_str(r#"  <script src="/pub/js/"#);
+    html.push_str(r#"  <script src="/"#);
+    html.push_str(PUB);
+    html.push_str("/js/");
     html.push_str(s);
     html.push_str(r#""></script>
 "#);
@@ -890,7 +947,9 @@ fn html_nav(link: &str) ->
   if link.eq("/") {
     html.push_str(r#"class="here" "#);
   }
-  html.push_str(r#"href="/"><img class="cup" src="/pub/img/agaric-24.png">b</a>
+  html.push_str(r#"href="/"><img class="cup" src="/"#);
+  html.push_str(PUB);
+  html.push_str(r#"/img/agaric-24.png">b</a>
     </div>
     <div class="links">
 "#);
@@ -939,7 +998,7 @@ fn html_foot(error: &str, query: &str, link: &str) ->
   html.push_str(r#"">/"#);
   html.push_str(link);
   if !query.is_empty() {
-    html.push_str(r#"<span class="slip">?tag=</span>"#);
+    html.push_str(":");
     html.push_str(query);
   };
   html.push_str(r#"</a></div>
