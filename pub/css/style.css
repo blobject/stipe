@@ -99,7 +99,7 @@ table th, table td {
 table, .small, .tag, .nav a, .foot, .foot .lace,
 .page-head .time, .page-head .lmod,
 .dev-item ol, .dev-item ul, .tags, .page-count,
-.pages .page-time .time, .pages .page-time .lmod {
+.pages .page-time .time, .pages .page-time .lmod, .pages .page-title {
   font-size: 13px;
 }
 
@@ -246,6 +246,10 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
 .page p {
   text-align: justify;
+}
+
+.page .left p {
+  text-align: left;
 }
 
 .page.e404 p, .page.e500 p {
@@ -431,8 +435,8 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 }
 
 .pages li {
-  margin: 5px -10px;
-  padding: 20px;
+  margin: 15px -10px;
+  padding: 10px 20px 30px;
   line-height: 2em;
 }
 
@@ -442,25 +446,39 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
 .pages .page-time {
   float: left;
-  margin: 0 15px 0 0;
+  margin: .5em 1em 0 0;
 }
 
-.pages .page-time .time, .pages .page-time .lmod, .pages .name {
+.pages .page-time .time, .pages .page-time .lmod, .pages .page-name {
   font-weight: 700;
   line-height: 1.5em;
 }
 
 .pages .page-time .time {
   color: #b0b0b0;
-  margin-top: -.25em;
 }
 
 .pages .page-time .lmod {
   color: #808080;
 }
 
-.pages .name {
-  padding: 15px 20px;
+.pages .page-title {
+  position: absolute;
+  z-index: 1;
+  font-weight: 700;
+  color: #b0b0b0;
+  margin-top: 1.75em;
+  padding-left: 8.55em;
+}
+
+.pages li:focus .page-title, .pages li:hover .page-title {
+  color: #a0a0a0;
+}
+
+.pages .page-name {
+  position: relative;
+  z-index: 2;
+  padding: .5em 1em 1em;
 }
 
 .pages .page-tags {
@@ -541,7 +559,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
   table, .small, .tag, .nav a, .foot, .foot .lace,
   .page-head .time, .page-head .lmod,
   .dev-item ol, .dev-item ul, .tags, .page-count,
-  .pages .page-time .time, .pages .page-time .lmod {
+  .pages .page-time .time, .pages .page-time .lmod, .pages .page-title {
     font-size: 12px;
   }
 
@@ -622,15 +640,20 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
   .pages li {
     margin: 5px -10px;
-    padding: 20px;
+    padding: 10px 20px 30px;
   }
 
   .pages .page-time {
-    margin: 0 10px 0 0;
+    margin: .5em 1em 0 0;
   }
 
-  .pages .name {
-    padding: 10px 15px;
+  .pages .page-title {
+    margin-top: 1.75em;
+    padding-left: 8.15em;
+  }
+
+  .pages .page-name {
+    padding: .5em .75em .75em;
   }
 
   .pages .page-tags {
@@ -664,7 +687,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
   table, .small, .tag, .nav a, .foot, .foot .lace,
   .page-head .tags, .page-head .time, .page-head .lmod,
   .dev-item ol, .dev-item ul, .tags, .page-count,
-  .pages .page-time .time, .pages .page-time .lmod {
+  .pages .page-time .time, .pages .page-time .lmod, .pages .page-title {
     font-size: 10px;
   }
 
@@ -753,15 +776,20 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
   .pages li {
     margin: 0 -15px;
-    padding: 15px;
+    padding: 8px 15px 23px;
   }
 
   .pages .page-time {
-    margin: 0 10px 0 0;
+    margin: .5em 1em 0 0;
   }
 
-  .pages .name {
-    padding: 8px 10px;
+  .pages .page-title {
+    margin-top: 1.75em;
+    padding-left: 7.9em;
+  }
+
+  .pages .page-name {
+    padding: .5em .5em .75em;
   }
 
   .pages .page-tags {

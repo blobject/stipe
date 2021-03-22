@@ -195,7 +195,7 @@ struct Page
 {
   name: String,
   link: String,
-  //title: String,
+  title: String,
   time: i64,
   lmod: i64,
   tags: Vec<String>,
@@ -334,6 +334,7 @@ impl State
     Ok(Page {
       name: name.to_string(),
       link: link.to_string(),
+      title: title.to_string(),
       time: time,
       lmod: lmod,
       tags: tags,
@@ -643,8 +644,7 @@ fn html(
 "#);
   s.push_str("  <title>");
   s.push_str(&titlestamp(!error.is_empty(), site, &link, title, &query));
-  s.push_str(r#"</title>
-"#);
+  s.push_str("</title>\n");
   s.push_str(&html_social(site, &link, title, &query));
   s.push_str(r#"  <link icon="/"#);
   s.push_str(PUB);
@@ -656,14 +656,11 @@ fn html(
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap">
 "#);
   s.push_str(&html_scripts(scripts));
-  s.push_str(r#"</head>
-<body>
-"#);
+  s.push_str("</head>\n<body>\n");
   s.push_str(&html_nav(&link));
   s.push_str(&belly);
   s.push_str(&html_foot(error, &query, &link));
-  s.push_str(r#"</body>
-"#);
+  s.push_str("</body>\n");
 
   s
 }
@@ -706,8 +703,7 @@ fn html_pages(
     html.push_str(tag);
     html.push_str(r#"</span><span class="tag-count">"#);
     html.push_str(&count.to_string());
-    html.push_str(r#"</span></a></li>
-"#);
+    html.push_str("</span></a></li>\n");
   }
   html.push_str(r#"      </ul>
       <ul class="pages">
@@ -721,7 +717,10 @@ fn html_pages(
     html.push_str(&timestamp(page.lmod));
     html.push_str(r#"</div>
           </div>
-          <a class="name" href="/"#);
+          <div class="page-title"><i>"#);
+    html.push_str(&page.title);
+    html.push_str(r#"</i></div>
+          <a class="page-name" href="/"#);
     html.push_str(&page.link);
     html.push_str(r#"">"#);
     html.push_str(name);
@@ -859,7 +858,7 @@ fn html_social(site: &str, link: &str, title: &str, tag: &str) ->
 {
   let mut html = String::new();
   let image = &["https://", site, "/", PUB, "/img/agaric-512.png"].join("");
-  let riddle = "What room has no walls?";
+  let riddle = "room with no walls";
   let full = &[site, "/", link].join("");
   let full_tag = &[full, ":", tag].join("");
   let stamp = &titlestamp(false, site, link, title, tag);
