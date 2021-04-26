@@ -45,15 +45,19 @@ h2 {
   color: #a32c2d;
 }
 
-h3, h4, h5, h6 {
-  margin: 35px 0 25px;
-}
-
 h3 {
-  color: #575a61;
+  color: #916814;
 }
 
-h4, h5, h6 {
+h4 {
+  color: #4b7d08;
+}
+
+h5 {
+  color: #237e6f;
+}
+
+h6 {
   color: #92959d;
 }
 
@@ -215,6 +219,8 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 }
 
 .nav .cup {
+  width: 24px;
+  height: 24px;
   margin-left: -5px;
   margin-right: 10px;
   vertical-align: middle;
@@ -332,6 +338,10 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
 .page-body h2 {
   margin: 50px 0 30px;
+}
+
+.page-body h3, .page-body h4, .page-body h5, .page-body h6 {
+  margin: 35px 0 25px;
 }
 
 .page-body .tags {
@@ -617,6 +627,10 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
     margin: 35px 0 20px;
   }
 
+  .page-body h3, .page-body h4, .page-body h5, .page-body h6 {
+    margin: 25px 0 15px;
+  }
+
   .page-body .tags {
     margin-bottom: 25px;
   }
@@ -747,6 +761,10 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
   .page-body h2 {
     margin: 25px 0 10px;
+  }
+
+  .page-body h3, .page-body h4, .page-body h5, .page-body h6 {
+    margin: 20px 0 5px;
   }
 
   .page-body .tags {

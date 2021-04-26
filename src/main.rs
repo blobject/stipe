@@ -44,6 +44,7 @@ async fn main() ->
       .service(actix_files::Files::new(&["/", PUB].join(""),
                                        &PUB).show_files_listing())
       .route("/favicon.ico",      web::get().to(route_fav))
+      .route("/favicon_dev.ico",  web::get().to(route_fav))
       .route("/",                 web::get().to(route_root))
       .route(&pages_route,        web::get().to(route_pages))
       .route("/{page:about}",     web::get().to(flip))
@@ -66,10 +67,11 @@ async fn route_miss(
 }
 
 
-async fn route_fav(_req: HttpRequest) ->
+async fn route_fav(req: HttpRequest) ->
   actix_web::Result<NamedFile>
 {
-  Ok(NamedFile::open(&[PUB, "/favicon.ico"].join(""))?)
+  let path = &bound(req.match_info().path());
+  Ok(NamedFile::open(&[PUB, path].join(""))?)
 }
 
 
@@ -948,7 +950,7 @@ fn html_nav(link: &str) ->
   }
   html.push_str(r#"href="/"><img class="cup" src="/"#);
   html.push_str(PUB);
-  html.push_str(r#"/img/agaric-24.png">b</a>
+  html.push_str(r#"/img/agaric-64.png">b</a>
     </div>
     <div class="links">
 "#);
