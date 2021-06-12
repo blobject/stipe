@@ -891,30 +891,30 @@ fn html_social(site: &str, link: &str, title: &str, tag: &str) ->
   <meta itemprop="image" content=""#);
   html.push_str(image);
   html.push_str(r#"">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content=""#);
+  <meta property="twitter:card" content="summary">
+  <meta property="twitter:title" content=""#);
   html.push_str(short);
   html.push_str(r#"">
-  <meta name="twitter:description" content=""#);
+  <meta property="twitter:description" content=""#);
   html.push_str(req);
   html.push_str(r#"">
-  <meta name="og:title" content=""#);
+  <meta property="og:title" content=""#);
   html.push_str(short);
   html.push_str(r#"">
-  <meta name="og:description" content=""#);
+  <meta property="og:description" content=""#);
   html.push_str(req);
   html.push_str(r#"">
-  <meta name="og:image" content=""#);
+  <meta property="og:image" content=""#);
   html.push_str(image);
   html.push_str(r#"">
-  <meta name="og:url" content=""#);
+  <meta property="og:url" content=""#);
   html.push_str(&["https://", req].join(""));
   html.push_str(r#"">
-  <meta name="og:site_name" content=""#);
+  <meta property="og:site_name" content=""#);
   html.push_str(short);
   html.push_str(r#"">
-  <meta name="og:locale" content="en_US">
-  <meta name="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="website">
 "#);
 
   html

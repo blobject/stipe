@@ -477,7 +477,8 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
   z-index: 1;
   font-weight: 700;
   color: #b0b0b0;
-  margin-top: 1.75em;
+  line-height: 1em;
+  margin-top: 2.25em;
   padding-left: 8.55em;
 }
 
@@ -662,7 +663,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
   }
 
   .pages .page-title {
-    margin-top: 1.75em;
+    margin-top: 2.25em;
     padding-left: 8.15em;
   }
 
@@ -802,7 +803,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
   }
 
   .pages .page-title {
-    margin-top: 1.75em;
+    margin-top: 2.25em;
     padding-left: 7.9em;
   }
 
