@@ -101,7 +101,7 @@ table th, table td {
 }
 
 table, .small, .tag, .nav a, .foot, .foot .lace,
-.page-head .time, .page-head .lmod,
+.page-head .time, .page-head .lmod, .page-body .ic,
 .dev-item ol, .dev-item ul, .tags, .page-count,
 .pages .page-time .time, .pages .page-time .lmod, .pages .page-title {
   font-size: 13px;
@@ -323,13 +323,14 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
   margin: 15px 0;
 }
 
-.page-body div.i img {
-  margin: 15px 0;
+.page-body div.ic {
+  text-align: center;
+  font-style: italic;
+  margin: -15px 0 2em;
 }
 
-.page-body div.i p {
-  margin: 0;
-  padding: 0;
+.page-body div.i img {
+  margin: 15px 0;
 }
 
 .page-body h1 {
@@ -568,7 +569,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
   }
 
   table, .small, .tag, .nav a, .foot, .foot .lace,
-  .page-head .time, .page-head .lmod,
+  .page-head .time, .page-head .lmod, .page-body .ic,
   .dev-item ol, .dev-item ul, .tags, .page-count,
   .pages .page-time .time, .pages .page-time .lmod, .pages .page-title {
     font-size: 12px;
@@ -614,6 +615,10 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
   .page-body div.i {
     margin: 10px 0;
+  }
+
+  .page-body div.ic {
+    margin: -10px 0 2em;
   }
 
   .page-body div.i img {
@@ -700,7 +705,7 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
   }
 
   table, .small, .tag, .nav a, .foot, .foot .lace,
-  .page-head .tags, .page-head .time, .page-head .lmod,
+  .page-head .tags, .page-head .time, .page-head .lmod, .page-body .ic,
   .dev-item ol, .dev-item ul, .tags, .page-count,
   .pages .page-time .time, .pages .page-time .lmod, .pages .page-title {
     font-size: 10px;
@@ -750,6 +755,10 @@ table, .small, .tag, .nav a, .foot, .foot .lace,
 
   .page-body div.i {
     margin: 5px 0;
+  }
+
+  .page-body div.ic {
+    margin: -5px 0 2em;
   }
 
   .page-body div.i img {
