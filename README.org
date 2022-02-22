@@ -51,5 +51,5 @@ The engine's original implementation [[https://github.com/blobject/stipe/tree/cl
 
 - Execute the server with ~cargo run~ or ~cargo run --release~.
 
-- Visit =http://localhost:8000/page/neuromancer=.
+- Visit =http://localhost/page/neuromancer=.
 

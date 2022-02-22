@@ -10,7 +10,7 @@ use std::sync::Mutex;
 
 
 static SITE:  &'static str = "b.agaric.net";
-static PORT:  &'static str = "8490";
+static PORT:  &'static str = "80";
 static PUB:   &'static str = "pub";
 static SCOPE: &'static str = "page";
 static DB:    &'static str = "db";
@@ -51,7 +51,7 @@ async fn main() ->
       .route("/{page:dev}{_:/?}", web::get().to(flip))
       .route(&page_route,         web::get().to(flip))
       .default_service(web::get().to(route_miss))
-  }).bind(["localhost:", PORT].join(""))?.run().await
+  }).bind(["0.0.0.0:", PORT].join(""))?.run().await
 }
 
 
