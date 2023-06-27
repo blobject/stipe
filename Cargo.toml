@@ -5,8 +5,8 @@ authors = ["blobject <agaric@pm.me>"]
 edition = "2021"
 
 [dependencies]
-actix-files = "0.5"
-actix-web = "3"
+actix-files = "0.6"
+actix-web = "4"
 ammonia = "3"
 chrono = "0.4"
 pulldown-cmark = { version = "0.9", default-features = false }

@@ -10,7 +10,7 @@ use std::sync::Mutex;
 
 
 static SITE:  &'static str = "b.agaric.net";
-static PORT:  &'static str = "80";
+static PORT:  &'static str = "8080";
 static PUB:   &'static str = "pub";
 static SCOPE: &'static str = "page";
 static DB:    &'static str = "db";
@@ -62,7 +62,7 @@ async fn route_miss(
   req: HttpRequest,
 ) -> impl Responder
 {
-  let name = &bound(req.match_info().path())[1..];
+  let name = &shave(req.match_info().as_str())[1..];
   respond_error(404, &state.site, name, "page not found", name)
 }
 
@@ -70,7 +70,7 @@ async fn route_miss(
 async fn route_fav(req: HttpRequest) ->
   actix_web::Result<NamedFile>
 {
-  let path = &bound(req.match_info().path());
+  let path = &shave(req.match_info().as_str());
   Ok(NamedFile::open(&[PUB, path].join(""))?)
 }
 
@@ -112,7 +112,7 @@ async fn route_pages(
 
   let pages_total = pages.len();
   let (err, query, tags_list, pages_list) =
-    &pages_lists(&clean(&bound(req.query_string())), &mut pages);
+    &pages_lists(&clean(&shave(req.query_string())), &mut pages);
   if *err || (0 == pages_list.len() && 0 < pages_total) {
     return respond_error(404, site, "pages", "no pages tagged", query);
   }
@@ -140,7 +140,7 @@ async fn flip(
   let dir = &state.dir;
   let scope = &state.scope;
   let n: String = req.match_info().get(scope).unwrap().parse().unwrap();
-  let name = &bound(&n);
+  let name = &shave(&n);
 
   if !Regex::new(r"^[0-9A-Za-z_-]+$").unwrap().is_match(name) ||
      !page_exists(dir, name)
@@ -577,9 +577,10 @@ fn page_lmod(meta: fs::Metadata) ->
 fn timestamp(secs: i64) ->
   String
 {
-  let then = chrono::NaiveDateTime::from_timestamp(secs, 0);
-
-  then.format("%Y-%m-%d").to_string()
+  match chrono::naive::NaiveDateTime::from_timestamp_opt(secs, 0) {
+    Some(then) => then.format("%Y-%m-%d").to_string(),
+    None => String::new(),
+  }
 }
 
 
@@ -607,7 +608,7 @@ fn titlestamp(error: bool, site: &str, link: &str, title: &str, tag: &str) ->
 }
 
 
-fn bound<S: Into<String>>(s: S) ->
+fn shave<S: Into<String>>(s: S) ->
   String
 {
   let max = 64;
